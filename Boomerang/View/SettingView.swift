@@ -9,7 +9,6 @@ import SwiftUI
 import FirebaseAuth
 
 struct SettingView: View {
-    @EnvironmentObject var authentication: Authentication
     @Binding var showSettingView: Bool
     @Binding var showMainView: Bool
     
@@ -17,7 +16,13 @@ struct SettingView: View {
         List {
             Section(header: Text("회원정보 관리"), content: {
                 Button(action: {
-                    authentication.signOut()
+                    let firebaseAuth = Auth.auth()
+                    
+                    do {
+                        try firebaseAuth.signOut()
+                    } catch let signOutError as NSError {
+                        print("Error signing out: %@", signOutError)
+                    }
                     
                     showSettingView = false
                     showMainView = false
@@ -33,6 +38,5 @@ struct SettingView: View {
 struct SettingView_Previews: PreviewProvider {
     static var previews: some View {
         SettingView(showSettingView: .constant(true), showMainView: .constant(true))
-            .environmentObject(Authentication())
     }
 }

@@ -6,9 +6,9 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct SignInView: View {
-    @EnvironmentObject var authentication: Authentication
     @State private var inputEmail: String = ""
     @State private var inputPw: String = ""
     @State private var showAlert: Bool = false
@@ -29,7 +29,13 @@ struct SignInView: View {
                 .padding(.bottom, 10)
             
             Button(action: {
-                authentication.signIn(userEmail: inputEmail, userPw: inputPw)
+                Auth.auth().signIn(withEmail: inputEmail, password: inputPw) { (user, error) in
+                    if user != nil {
+                        showMainView = true
+                    } else {
+                        showAlert = true
+                    }
+                }
             }) {
                 Text("로그인")
                     .font(.headline)
@@ -54,16 +60,8 @@ struct SignInView: View {
             }
             .padding(.top, 10)
             .sheet(isPresented: $showSignUpView, content: { SignUpView() })
-            
         }
         .navigationDestination(isPresented: $showMainView, destination: { MainView(showMainView: $showMainView)
-                .environmentObject(authentication)
-        })
-        .onReceive(authentication.$showAlert, perform: {
-            self.showAlert = $0
-        })
-        .onReceive(authentication.$showMainView, perform: {
-            self.showMainView = $0
         })
         .padding()
     }
@@ -72,6 +70,5 @@ struct SignInView: View {
 struct SignInView_Previews: PreviewProvider {
     static var previews: some View {
         SignInView(showMainView: false)
-            .environmentObject(Authentication())
     }
 }

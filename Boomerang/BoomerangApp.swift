@@ -20,17 +20,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct BoomerangApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @ObservedObject var authentication: Authentication = Authentication()
     
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 if let user = Auth.auth().currentUser {
                     SignInView(showMainView: true)
-                        .environmentObject(authentication)
                 } else {
                     SignInView(showMainView: false)
-                        .environmentObject(authentication)
                 }
             }
         }

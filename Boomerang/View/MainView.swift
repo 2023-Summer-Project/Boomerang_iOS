@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct MainView: View {
-    @EnvironmentObject var authentication: Authentication
     @State var showSettingView: Bool = false
     @Binding var showMainView: Bool
     
@@ -22,11 +21,10 @@ struct MainView: View {
                 Button(action: {
                     showSettingView = true
                 }) {
-                    Image(systemName: "info.circle")
+                    Image(systemName: "gearshape.fill")
                 }
                 .navigationDestination(isPresented: $showSettingView, destination: {
                     SettingView(showSettingView: $showSettingView, showMainView: $showMainView)
-                        .environmentObject(authentication)
                 })
             }
         }
@@ -37,6 +35,5 @@ struct MainView: View {
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         MainView(showMainView: .constant(true))
-            .environmentObject(Authentication())
     }
 }

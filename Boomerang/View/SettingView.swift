@@ -6,24 +6,22 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 
 struct SettingView: View {
+    @EnvironmentObject var authentication: Authentication
     @Binding var showSettingView: Bool
     @Binding var showMainView: Bool
     
     var body: some View {
         List {
-            Section(header: Text("회원정보 관리"), content: {
+            Section(header: Text("계정 정보 확인"), content: {
+                NavigationLink(destination: { UserInfoView() }, label: { Text("내 정보 확인") })
+            })
+            
+            Section(header: Text("로그인 관리"), content: {
                 Button(action: {
-                    let firebaseAuth = Auth.auth()
-                    
-                    do {
-                        try firebaseAuth.signOut()
-                    } catch let signOutError as NSError {
-                        print("Error signing out: %@", signOutError)
-                    }
-                    
+                    authentication.signOut()
+
                     showSettingView = false
                     showMainView = false
                 }, label: {
@@ -32,11 +30,14 @@ struct SettingView: View {
                 })
             })
         }
+        .navigationTitle("설정")
+        .navigationBarTitleDisplayMode(.large)
     }
 }
 
 struct SettingView_Previews: PreviewProvider {
     static var previews: some View {
         SettingView(showSettingView: .constant(true), showMainView: .constant(true))
+            .environmentObject(Authentication())
     }
 }

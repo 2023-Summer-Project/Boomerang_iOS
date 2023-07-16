@@ -6,13 +6,14 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 
-struct SignInView: View {
+struct SignInView: View {  
+    @EnvironmentObject var authentication: Authentication
     @State private var inputEmail: String = ""
     @State private var inputPw: String = ""
     @State private var showAlert: Bool = false
     @State private var showSignUpView: Bool = false
+//    @State private var isLoading: Bool = false
     @State var showMainView: Bool
     
     var body: some View {
@@ -29,8 +30,8 @@ struct SignInView: View {
                 .padding(.bottom, 10)
             
             Button(action: {
-                Auth.auth().signIn(withEmail: inputEmail, password: inputPw) { (user, error) in
-                    if user != nil {
+                authentication.signIn(userEmail: inputEmail, userPw: inputPw) { result in
+                    if result {
                         showMainView = true
                     } else {
                         showAlert = true
@@ -49,19 +50,24 @@ struct SignInView: View {
             .alert("이메일이 존재하지 않거나 비밀번호가 일치하지 않습니다.", isPresented: $showAlert) {
                 Button("확인", role: .cancel) {}
             }
+//            .alert(isPresented: $isLoading) {
+//                Alert(title: Text("로그인 중입니다."), dismissButton: nil)
+//            }
             
             Divider()
             
-            Button(action: {
-                showSignUpView = true
-            }) {
+            Button(action: { showSignUpView = true }) {
                 Text("회원가입")
                     .font(.headline)
             }
             .padding(.top, 10)
-            .sheet(isPresented: $showSignUpView, content: { SignUpView() })
         }
+        .sheet(isPresented: $showSignUpView, content: {
+            SignUpView()
+                .environmentObject(authentication)
+        })
         .navigationDestination(isPresented: $showMainView, destination: { MainView(showMainView: $showMainView)
+                .environmentObject(authentication)
         })
         .padding()
     }
@@ -70,5 +76,6 @@ struct SignInView: View {
 struct SignInView_Previews: PreviewProvider {
     static var previews: some View {
         SignInView(showMainView: false)
+            .environmentObject(Authentication())
     }
 }

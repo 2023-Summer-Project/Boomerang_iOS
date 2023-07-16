@@ -8,13 +8,20 @@
 import SwiftUI
 
 struct MainView: View {
+    @EnvironmentObject var authentication: Authentication
     @State var showSettingView: Bool = false
     @Binding var showMainView: Bool
     
     var body: some View {
         List {
-            Text("row1")
-            Text("row2")
+            Section {
+                Text("row1")
+                Text("row2")
+            }
+            
+            Section {
+                Text("row3")
+            }
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -25,6 +32,7 @@ struct MainView: View {
                 }
                 .navigationDestination(isPresented: $showSettingView, destination: {
                     SettingView(showSettingView: $showSettingView, showMainView: $showMainView)
+                        .environmentObject(authentication)
                 })
             }
         }
@@ -35,5 +43,6 @@ struct MainView: View {
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         MainView(showMainView: .constant(true))
+            .environmentObject(Authentication())
     }
 }

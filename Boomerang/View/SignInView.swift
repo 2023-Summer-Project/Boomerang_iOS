@@ -30,14 +30,14 @@ struct SignInView: View {
                 .padding(.bottom, 10)
             
             Button(action: {
-                authentication.signIn(userEmail: inputEmail, userPw: inputPw) { result in
-                    if result {
+                Task {
+                    if await authentication.signIn(userEmail: inputEmail, userPw: inputPw) {
                         showMainView = true
                     } else {
                         showAlert = true
                     }
                 }
-            }) {
+            }, label: {
                 Text("로그인")
                     .font(.headline)
                     .foregroundColor(.white)
@@ -45,7 +45,7 @@ struct SignInView: View {
                     .padding(.vertical, 10)
                     .background(Color.blue)
                     .cornerRadius(8)
-            }
+            })
             .padding(.bottom, 10)
             .alert("이메일이 존재하지 않거나 비밀번호가 일치하지 않습니다.", isPresented: $showAlert) {
                 Button("확인", role: .cancel) {}
@@ -62,8 +62,8 @@ struct SignInView: View {
             }
             .padding(.top, 10)
         }
-        .sheet(isPresented: $showSignUpView, content: {
-            SignUpView()
+        .navigationDestination(isPresented: $showSignUpView, destination: {
+            SignUpView1()
                 .environmentObject(authentication)
         })
         .navigationDestination(isPresented: $showMainView, destination: { MainView(showMainView: $showMainView)

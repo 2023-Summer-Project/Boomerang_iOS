@@ -24,7 +24,7 @@ struct BoomerangApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
+            NavigationView {
                 // 로그인이 되어 있는 경우
                 if authentication.currentUser != nil && authentication.isSignUpProcess == false {
                     SignInView(showMainView: true)
@@ -36,6 +36,7 @@ struct BoomerangApp: App {
                         .environmentObject(authentication)
                 }
             }
+            .navigationViewStyle(.stack)
         }
     }
 }

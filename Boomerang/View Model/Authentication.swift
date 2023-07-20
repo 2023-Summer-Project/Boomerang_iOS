@@ -13,7 +13,6 @@ enum EmailInputState {
 }
 
 final class Authentication: ObservableObject {
-    //    @Published var isSignIn: Bool = false
     @Published var emailInputState: EmailInputState = .empty
     @Published var isVerifiedEmail: Bool = false
     @Published var timeLeft: Int = 180
@@ -30,7 +29,6 @@ final class Authentication: ObservableObject {
 //        //로그인 시도
 //        Auth.auth().signIn(withEmail: userEmail, password: userPw) { (user, error) in
 //            if user != nil {
-//                //self.isSignIn = true
 //                completion(true)
 //            } else {
 //                completion(false)

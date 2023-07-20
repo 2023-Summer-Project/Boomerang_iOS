@@ -13,7 +13,7 @@ struct SignInView: View {
     @State private var inputPw: String = ""
     @State private var showAlert: Bool = false
     @State private var showSignUpView: Bool = false
-//    @State private var isLoading: Bool = false
+    @State private var isLoading: Bool = false
     @State var showMainView: Bool
     
     var body: some View {
@@ -32,9 +32,9 @@ struct SignInView: View {
             Button(action: {
                 Task {
                     if await authentication.signIn(userEmail: inputEmail, userPw: inputPw) {
-                        showMainView = true
+                        showMainView.toggle()
                     } else {
-                        showAlert = true
+                        showAlert.toggle()
                     }
                 }
             }, label: {
@@ -61,14 +61,17 @@ struct SignInView: View {
                     .font(.headline)
             }
             .padding(.top, 10)
+            
+            NavigationLink(isActive: $showMainView, destination: {
+                MainView(showMainView: $showMainView)
+                    .environmentObject(authentication)
+            }, label: {})
+            
+            NavigationLink(isActive: $showSignUpView, destination: {
+                SignUpView1()
+                    .environmentObject(authentication)
+            }, label: {})
         }
-        .navigationDestination(isPresented: $showSignUpView, destination: {
-            SignUpView1()
-                .environmentObject(authentication)
-        })
-        .navigationDestination(isPresented: $showMainView, destination: { MainView(showMainView: $showMainView)
-                .environmentObject(authentication)
-        })
         .padding()
     }
 }

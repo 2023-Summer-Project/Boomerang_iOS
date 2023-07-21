@@ -25,8 +25,10 @@ struct ProductDetailView: View {
                     Text("\(Int(product.PRICE))")
                         .foregroundColor(.green)
                         .bold()
+                        .padding(.leading, -5)
                     Text("원")
                         .padding(.leading, -5)
+                    Spacer()
                 }
                 .font(.system(size: 20))
 

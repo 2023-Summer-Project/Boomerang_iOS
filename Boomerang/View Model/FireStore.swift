@@ -18,15 +18,23 @@ final class FireStore: ObservableObject {
         fetchProduct()
     }
     
-    func fetchProduct() {
-        let docRef = db.collection("Product").document("3YqLDLepWnn6J82A1IPP")
-        
-        docRef.getDocument(as: Product.self) { result in
-            switch result {
-            case .success(let product):
-                self.products.append(product)
-            case .failure(let error):
-                print("Error decoding Product", error)
+    func fetchProduct() {        
+        db.collection("Product").getDocuments() { (querySnapshot, error) in
+            if let error {
+                print("Error getting documents: \(error)")
+            } else {
+                let _ = querySnapshot!.documents.map {
+                    let docRef = self.db.collection("Product").document($0.documentID)
+                    
+                    docRef.getDocument(as: Product.self) { result in
+                        switch result {
+                        case .success(let product):
+                            self.products.append(product)
+                        case .failure(let error):
+                            print("Error decoding Product", error)
+                        }
+                    }
+                }
             }
         }
     }

@@ -11,7 +11,7 @@ struct ProductListView: View {
     @ObservedObject var fireStore: FireStore = FireStore()
     @EnvironmentObject var authentication: Authentication
     @State var search: String = ""
-    @State var showWritePost: Bool = false
+    @State var showWritePostView: Bool = false
     @Binding var showMainView: Bool
     
     var body: some View {
@@ -27,8 +27,8 @@ struct ProductListView: View {
                 }
             }
             .listStyle(.plain)
-            .sheet(isPresented: $showWritePost, content: {
-                EmptyView()
+            .sheet(isPresented: $showWritePostView, content: {
+                WritePostView(showWritePostView: $showWritePostView)
             })
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -39,7 +39,7 @@ struct ProductListView: View {
                 ToolbarItemGroup(placement: .bottomBar, content: {
                     Spacer()
                     
-                    Button(action: { showWritePost = true }, label: {
+                    Button(action: { showWritePostView = true }, label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.largeTitle)
                             .foregroundColor(.green)

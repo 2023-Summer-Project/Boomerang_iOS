@@ -11,6 +11,7 @@ struct ProductListView: View {
     @ObservedObject var fireStore: FireStore = FireStore()
     @EnvironmentObject var authentication: Authentication
     @State var search: String = ""
+    @State var showWritePost: Bool = false
     @Binding var showMainView: Bool
     
     var body: some View {
@@ -25,15 +26,24 @@ struct ProductListView: View {
                     .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
                 }
             }
-            //.scrollContentBackground(.hidden)
-            //.searchable(text: $search)
             .listStyle(.plain)
+            .sheet(isPresented: $showWritePost, content: {
+                EmptyView()
+            })
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {}, label: { Image(systemName: "bell.fill")
-                    })
+                    NavigationLink(destination: { NotificationView() }, label: { Image(systemName: "bell") })
                 }
-                ToolbarItem(placement: .navigationBarLeading, content: {  EmptyView()
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .bottomBar, content: {
+                    Spacer()
+                    
+                    Button(action: { showWritePost = true }, label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.largeTitle)
+                            .foregroundColor(.green)
+                    })
                 })
             }
         }

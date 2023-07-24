@@ -25,7 +25,7 @@ struct ProductListRowView: View {
                 HStack {
                     Text("\(Int(product.PRICE))")
                         .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(.green)
+                        .foregroundColor(.accentColor)
                     Text("원")
                         .padding(.leading, -5)
                 }

@@ -18,7 +18,9 @@ final class FireStore: ObservableObject {
         fetchProduct()
     }
     
-    func fetchProduct() {        
+    func fetchProduct() {
+        products = []
+        
         db.collection("Product").getDocuments() { (querySnapshot, error) in
             if let error {
                 print("Error getting documents: \(error)")
@@ -37,5 +39,19 @@ final class FireStore: ObservableObject {
                 }
             }
         }
+    }
+    
+    func addProduct(POST_CONTENT: String, POST_TITLE: String, PRICE: Int, OWNER_ID: String) {
+        let product: Dictionary<String, Any> = ["AVAILABILITY": true, "LOCATION": "동백동", "PRODUCT_NAME": "", "PRODUCT_TYPE": "", "POST_CONTENT": POST_CONTENT, "POST_TITLE": POST_TITLE, "PRICE": PRICE, "OWNER_ID": OWNER_ID]
+        
+        db.collection("Product").document(UUID().uuidString).setData(product) { error in
+            if let error = error {
+                    print("Error writing document: \(error)")
+                } else {
+                    print("Document successfully written!")
+                }
+        }
+        
+        fetchProduct()
     }
 }

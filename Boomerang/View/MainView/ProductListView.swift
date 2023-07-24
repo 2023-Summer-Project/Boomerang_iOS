@@ -27,26 +27,59 @@ struct ProductListView: View {
                 }
             }
             .listStyle(.plain)
+            .toolbarColorScheme(.light, for: .bottomBar)
             .sheet(isPresented: $showWritePostView, content: {
                 WritePostView(showWritePostView: $showWritePostView)
+                    .environmentObject(fireStore)
+                    .environmentObject(authentication)
             })
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: { NotificationView() }, label: { Image(systemName: "bell") })
+                    NavigationLink(destination: { NotificationView() }, label: {
+                        Image(systemName: "bell.fill")
+                    })
                 }
             }
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar, content: {
                     Spacer()
-                    
+
                     Button(action: { showWritePostView = true }, label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.largeTitle)
-                            .foregroundColor(.green)
                     })
+                    .padding(.bottom, 30)
                 })
             }
+            .refreshable {
+                //아래로 당겨서 refresh
+                fireStore.fetchProduct()
+            }
         }
+        .onAppear {
+            UIToolbar.changeAppearance(clear: true)
+        }
+    }
+}
+
+extension UIToolbar {
+    static func changeAppearance(clear: Bool) {
+        let appearance = UIToolbarAppearance()
+        
+        if clear {
+            appearance.configureWithOpaqueBackground()
+        } else {
+            appearance.configureWithDefaultBackground()
+        }
+        
+        // customize appearance for your needs here
+        appearance.shadowColor = .clear
+        appearance.backgroundColor = .clear
+        appearance.backgroundImage = UIImage(named: "imageName")
+        
+        UIToolbar.appearance().standardAppearance = appearance
+        UIToolbar.appearance().compactAppearance = appearance
+        UIToolbar.appearance().scrollEdgeAppearance = appearance
     }
 }
 

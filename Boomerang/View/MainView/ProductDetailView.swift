@@ -23,7 +23,7 @@ struct ProductDetailView: View {
                 HStack {
                     Text("대여비: ")
                     Text("\(Int(product.PRICE))")
-                        .foregroundColor(.green)
+                        .foregroundColor(.accentColor)
                         .bold()
                         .padding(.leading, -5)
                     Text("원")
@@ -42,7 +42,7 @@ struct ProductDetailView: View {
             }
             .padding()
         }
-        .ignoresSafeArea()
+        .ignoresSafeArea(edges: .top)    //위쪽으로 SafeArea 삭제
     }
 }
 

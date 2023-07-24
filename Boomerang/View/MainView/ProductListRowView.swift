@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProductListRowView: View {
-    var product: Product
+    var product: (String, Product)
     
     var body: some View {
         HStack(alignment: .top) {
@@ -18,12 +18,12 @@ struct ProductListRowView: View {
                 .cornerRadius(15)
             
             VStack(alignment: .leading) {
-                Text(product.POST_TITLE)
+                Text(product.1.POST_TITLE)
                     .font(.system(size: 18, weight: .medium))
                     .padding(.bottom, 1.5)
                 
                 HStack {
-                    Text("\(Int(product.PRICE))")
+                    Text("\(Int(product.1.PRICE))")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.accentColor)
                     Text("원")
@@ -39,6 +39,6 @@ struct ProductListRowView: View {
 
 struct ProductListRowView_Previews: PreviewProvider {
     static var previews: some View {
-        ProductListRowView(product: Product(AVAILABILITY: true, LOCATION: "동백동", OWNER_ID: "FPREAFuqthsevfqR3tJw", POST_CONTENT: "맥북", POST_TITLE: "맥북 빌려드립니다.", PRICE: 50000.0, PRODUCT_NAME: "맥북", PRODUCT_TYPE: "노트북"))
+        ProductListRowView(product: ("TvxG3typJb5LyzYXdPDL" , Product(AVAILABILITY: true, LOCATION: "동백동", OWNER_ID: "FPREAFuqthsevfqR3tJw", POST_CONTENT: "맥북", POST_TITLE: "맥북 빌려드립니다.", PRICE: 50000.0, PRODUCT_NAME: "맥북", PRODUCT_TYPE: "노트북")))
     }
 }

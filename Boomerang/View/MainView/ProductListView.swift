@@ -17,11 +17,14 @@ struct ProductListView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(fireStore.products, id: \.self) { product in
+                ForEach(fireStore.products, id: \.0) { product in
                     ZStack {
-                        NavigationLink(destination: { ProductDetailView(product: product) }, label: {})
+                        NavigationLink(destination: { ProductDetailView(product: (product.0, product.1))
+                                .environmentObject(authentication)
+                                .environmentObject(fireStore)
+                        }, label: {})
                             .opacity(0.0)
-                        ProductListRowView(product: product)
+                        ProductListRowView(product: (product.0, product.1))
                     }
                     .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
                 }
@@ -46,9 +49,10 @@ struct ProductListView: View {
 
                     Button(action: { showWritePostView = true }, label: {
                         Image(systemName: "plus.circle.fill")
-                            .font(.largeTitle)
+                            .font(.system(size: 45))
                     })
                     .padding(.bottom, 30)
+                    .padding(.trailing, -10)
                 })
             }
             .refreshable {
@@ -75,7 +79,6 @@ extension UIToolbar {
         // customize appearance for your needs here
         appearance.shadowColor = .clear
         appearance.backgroundColor = .clear
-        appearance.backgroundImage = UIImage(named: "imageName")
         
         UIToolbar.appearance().standardAppearance = appearance
         UIToolbar.appearance().compactAppearance = appearance

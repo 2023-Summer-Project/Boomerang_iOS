@@ -10,7 +10,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 final class FireStore: ObservableObject {
-    @Published var products: [Product] = []
+    @Published var products: [(String, Product)] = []
     
     let db = Firestore.firestore()
     
@@ -31,7 +31,7 @@ final class FireStore: ObservableObject {
                     docRef.getDocument(as: Product.self) { result in
                         switch result {
                         case .success(let product):
-                            self.products.append(product)
+                            self.products.append((docRef.documentID, product))
                         case .failure(let error):
                             print("Error decoding Product", error)
                         }
@@ -53,5 +53,15 @@ final class FireStore: ObservableObject {
         }
         
         fetchProduct()
+    }
+    
+    func removeProduct(documentId: String) {
+        db.collection("Product").document(documentId).delete() { error in
+            if let error = error {
+                print("Error removing document: \(error)")
+            } else {
+                print("Document successfully removed!")
+            }
+        }
     }
 }

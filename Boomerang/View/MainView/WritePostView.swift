@@ -31,9 +31,8 @@ struct WritePostView: View {
                 }
                 
                 Text("물건 소개")
-                TextField("물건에 대한 소개를 입력해 주세요.", text: $content)
+                TextField("물건에 대한 소개를 작성해 주세요.", text: $content, axis: .vertical)
                     .textFieldStyle(.roundedBorder)
-                
             }
             .padding()
         }

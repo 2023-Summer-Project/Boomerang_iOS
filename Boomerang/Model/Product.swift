@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct Product: Codable, Hashable {
+    var IMAGES: [String]
     var AVAILABILITY: Bool    //1: true, 0: false
     var LOCATION: String
     var OWNER_ID: String

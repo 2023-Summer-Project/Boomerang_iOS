@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProductListView: View {
-    @ObservedObject var fireStore: FireStore = FireStore()
+    @EnvironmentObject var fireStore: FireStore
     @EnvironmentObject var authentication: Authentication
     @State var search: String = ""
     @State var showWritePostView: Bool = false
@@ -19,12 +19,13 @@ struct ProductListView: View {
             List {
                 ForEach(fireStore.products, id: \.0) { product in
                     ZStack {
-                        NavigationLink(destination: { ProductDetailView(product: (product.0, product.1))
+                        NavigationLink(destination: { ProductDetailView(product: product)
                                 .environmentObject(authentication)
                                 .environmentObject(fireStore)
                         }, label: {})
                             .opacity(0.0)
-                        ProductListRowView(product: (product.0, product.1))
+                        ProductListRowView(product: product)
+                            .environmentObject(fireStore)
                     }
                     .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
                 }
@@ -76,7 +77,6 @@ extension UIToolbar {
             appearance.configureWithDefaultBackground()
         }
         
-        // customize appearance for your needs here
         appearance.shadowColor = .clear
         appearance.backgroundColor = .clear
         
@@ -90,5 +90,6 @@ struct ProductListView_Previews: PreviewProvider {
     static var previews: some View {
         ProductListView(showMainView: .constant(true))
             .environmentObject(Authentication())
+            .environmentObject(FireStore())
     }
 }

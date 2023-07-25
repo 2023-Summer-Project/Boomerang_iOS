@@ -24,7 +24,11 @@ struct ProductListRowView: View {
             VStack(alignment: .leading) {
                 Text(product.1.POST_TITLE)
                     .font(.system(size: 18, weight: .medium))
-                    .padding(.bottom, 1.5)
+                    //.padding(.bottom, 1.5)
+                
+                Text(product.1.LOCATION)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(.gray)
                 
                 HStack {
                     Text("\(Int(product.1.PRICE))")

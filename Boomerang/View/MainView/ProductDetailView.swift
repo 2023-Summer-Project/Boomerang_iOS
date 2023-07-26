@@ -57,7 +57,7 @@ struct ProductDetailView: View {
         }
         .alert("경고", isPresented: $showDeleteAlert) {
             Button("Delete", role: .destructive) {
-                fireStore.removeProduct(documentId: product.0)
+                fireStore.removeProduct(documentID: product.0)
                 fireStore.fetchProduct()
             }
         } message: {

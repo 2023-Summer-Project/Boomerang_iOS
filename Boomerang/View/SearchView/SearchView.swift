@@ -8,18 +8,18 @@
 import SwiftUI
 
 struct SearchView: View {
-    @EnvironmentObject var fireStore: FireStore
+    @EnvironmentObject var fireStoreViewModel: FireStoreViewModel
     @EnvironmentObject var authentication: Authentication
     @State var search: String = ""
     
     var body: some View {
         NavigationView {
             List {
-                ForEach(fireStore.filteredProducts, id: \.0) { product in
+                ForEach(fireStoreViewModel.filteredProducts, id: \.self) { product in
                     ZStack {
                         NavigationLink(destination: { ProductDetailView(product: product)
                                 .environmentObject(authentication)
-                                .environmentObject(fireStore)
+                                .environmentObject(fireStoreViewModel)
                         }, label: {})
                             .opacity(0.0)
                         ProductListRowView(product: product)
@@ -31,7 +31,7 @@ struct SearchView: View {
         }
         .searchable(text: $search)
         .onChange(of: search, perform: {
-            fireStore.searchProducts($0)
+            fireStoreViewModel.searchProducts($0)
         })
     }
 }
@@ -40,6 +40,6 @@ struct SearchView_Previews: PreviewProvider {
     static var previews: some View {
         SearchView()
             .environmentObject(Authentication())
-            .environmentObject(FireStore())
+            .environmentObject(FireStoreViewModel())
     }
 }

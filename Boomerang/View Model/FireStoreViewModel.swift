@@ -8,13 +8,14 @@
 import Combine
 import SwiftUI
 
-typealias ProductInfo = (String, Product, UIImage?)
+typealias ProductInfo = (Product, UIImage?)
 
-final class FireStore: ObservableObject {
-    @Published var products: [ProductInfo] = []
-    @Published var filteredProducts: [ProductInfo] = []
+final class FireStoreViewModel: ObservableObject {
+    @Published var products: [Product] = []
+    @Published var filteredProducts: [Product] = []
     
     private var cancellables = Set<AnyCancellable>()
+    private var tmpArray: [ProductInfo] = []
     
     init() {
         fetchProduct()
@@ -22,11 +23,11 @@ final class FireStore: ObservableObject {
 }
 
 //MARK: - fetch Data
-extension FireStore {
+extension FireStoreViewModel {
     func fetchProduct() {
         products.removeAll()
         
-        FireStoreModel.fetchAllDocuments()
+        FireStoreModel.fetchDocuments()
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -34,43 +35,19 @@ extension FireStore {
                 case .failure(let error):
                     print("Error fetching documents: ", error)
                 }
-            }, receiveValue: { querySnapshot in
-                let _ = querySnapshot.documents.map { document in
-                    FireStoreModel.fetchDocument(documentID: document.documentID)
-                        .sink(receiveCompletion: { completion in
-                            switch completion {
-                            case .finished:
-                                print("Document fetch completed.")
-                            case .failure(let error):
-                                print("Error fetching document: ", error)
-                            }
-                        }, receiveValue: { (documentID, product) in
-                            FireStoreModel.fetchImage(imageName: product.IMAGES[0])
-                                .sink(receiveCompletion: { completion in
-                                    switch completion {
-                                    case .finished:
-                                        print("Image fetch completed.")
-                                    case .failure(let error):
-                                        print("Error fetching Image: ", error)
-                                    }
-                                }, receiveValue: { image in
-                                    self.products.append((documentID, product, image))
-                                })
-                                .store(in: &self.cancellables)
-                        })
-                        .store(in: &self.cancellables)
-                }
+            }, receiveValue: { products in
+                self.products = products
             })
             .store(in: &self.cancellables)
     }
 }
 
 //MARK: - add & delete data
-extension FireStore {
-    func addProduct(POST_CONTENT: String, POST_TITLE: String, PRICE: Int, OWNER_ID: String) {
-        let product: Dictionary<String, Any> = ["AVAILABILITY": true, "LOCATION": "동백동", "PRODUCT_NAME": "", "PRODUCT_TYPE": "", "POST_CONTENT": POST_CONTENT, "POST_TITLE": POST_TITLE, "PRICE": PRICE, "OWNER_ID": OWNER_ID]
+extension FireStoreViewModel {
+    func addProduct(imageData: Data, POST_CONTENT: String, POST_TITLE: String, PRICE: Int, OWNER_ID: String) {
+        let product: Dictionary<String, Any> = ["IMAGES": ["test.jpg"], "AVAILABILITY": true, "LOCATION": "동백동", "PRODUCT_NAME": "", "PRODUCT_TYPE": "", "POST_CONTENT": POST_CONTENT, "POST_TITLE": POST_TITLE, "PRICE": PRICE, "OWNER_ID": OWNER_ID]
         
-        FireStoreModel.writeDocument(product: product)
+        FireStoreModel.addDocument(newProduct: product)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -83,11 +60,25 @@ extension FireStore {
             })
             .store(in: &self.cancellables)
         
+        FireStoreModel.uploadImage(dataToUpload: imageData)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    print("image upload finished")
+                case .failure(let error):
+                    print("image upload failed: ", error)
+                }
+            }, receiveValue: { _ in
+                //TODO:
+                print("image upload success")
+            })
+            .store(in: &self.cancellables)
+        
         fetchProduct()
     }
     
-    func removeProduct(documentID: String) {
-        FireStoreModel.removeDocument(documentID: documentID)
+    func deleteProduct(targetID: String) {
+        FireStoreModel.deleteDocument(id: targetID)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -103,7 +94,7 @@ extension FireStore {
 }
 
 //MARK: - search data
-extension FireStore {
+extension FireStoreViewModel {
     func searchProducts(_ target: String) {
         filteredProducts = FireStoreModel.filterProducts(target: target, products: products)
     }

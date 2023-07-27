@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProductListView: View {
-    @EnvironmentObject var fireStore: FireStore
+    @EnvironmentObject var fireStore: FireStoreViewModel
     @EnvironmentObject var authentication: Authentication
     @State var search: String = ""
     @State var showWritePostView: Bool = false
@@ -17,13 +17,13 @@ struct ProductListView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(fireStore.products, id: \.0) { product in
+                ForEach(fireStore.products, id: \.self) { product in
                     ZStack {
                         NavigationLink(destination: { ProductDetailView(product: product)
                                 .environmentObject(authentication)
                                 .environmentObject(fireStore)
                         }, label: {})
-                            .opacity(0.0)
+                        .opacity(0.0)
                         ProductListRowView(product: product)
                             .environmentObject(fireStore)
                     }
@@ -32,11 +32,6 @@ struct ProductListView: View {
             }
             .listStyle(.plain)
             .toolbarColorScheme(.light, for: .bottomBar)
-            .sheet(isPresented: $showWritePostView, content: {
-                WritePostView(showWritePostView: $showWritePostView)
-                    .environmentObject(fireStore)
-                    .environmentObject(authentication)
-            })
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: { NotificationView() }, label: {
@@ -47,13 +42,19 @@ struct ProductListView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar, content: {
                     Spacer()
-
-                    Button(action: { showWritePostView = true }, label: {
+                    
+                    NavigationLink(isActive: $showWritePostView, destination: {
+                        WritePostView(showWritePostView: $showWritePostView)
+                    }, label: {})
+                    
+                    Button(action: {
+                        showWritePostView = true
+                    }, label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 45))
                     })
                     .padding(.bottom, 30)
-                    .padding(.trailing, -10)
+                    .padding(.trailing, -20)
                 })
             }
             .refreshable {
@@ -90,6 +91,6 @@ struct ProductListView_Previews: PreviewProvider {
     static var previews: some View {
         ProductListView(showMainView: .constant(true))
             .environmentObject(Authentication())
-            .environmentObject(FireStore())
+            .environmentObject(FireStoreViewModel())
     }
 }

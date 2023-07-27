@@ -7,8 +7,10 @@
 
 import Foundation
 import SwiftUI
+import FirebaseFirestoreSwift
 
 struct Product: Codable, Hashable {
+    var id: String
     var IMAGES: [String]
     var AVAILABILITY: Bool    //1: true, 0: false
     var LOCATION: String

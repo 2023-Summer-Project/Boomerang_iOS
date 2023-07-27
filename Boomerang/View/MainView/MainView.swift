@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @ObservedObject var fireStore: FireStore = FireStore()
+    @ObservedObject var fireStoreViewModel: FireStoreViewModel = FireStoreViewModel()
     @EnvironmentObject var authentication: Authentication
     @Binding var showMainView: Bool
     @State var notificationCount: Int = 99
@@ -17,7 +17,7 @@ struct MainView: View {
         TabView {
             ProductListView(showMainView: $showMainView)
                 .environmentObject(authentication)
-                .environmentObject(fireStore)
+                .environmentObject(fireStoreViewModel)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("홈")
@@ -25,7 +25,7 @@ struct MainView: View {
             
             SearchView()
                 .environmentObject(authentication)
-                .environmentObject(fireStore)
+                .environmentObject(fireStoreViewModel)
                 .tabItem {
                     Image(systemName: "magnifyingglass.circle.fill")
                     Text("검색")

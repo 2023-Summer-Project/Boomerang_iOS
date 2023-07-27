@@ -6,70 +6,45 @@
 //
 
 import Combine
+import Foundation
 import FirebaseFirestore
 import FirebaseFirestoreSwift
 import FirebaseStorage
 
 struct FireStoreModel {
     static private let db = Firestore.firestore()
+    static private let storage = Storage.storage()
+    static private let gsReference = storage.reference(forURL: "gs://ios-demo-ae41b.appspot.com/")
     
-    static func filterProducts(target: String, products: [ProductInfo]) -> [ProductInfo] {
+    static func filterProducts(target: String, products: [Product]) -> [Product] {
         let result = products.filter {
-            return $0.1.POST_TITLE.contains(target) || $0.1.POST_CONTENT.contains(target)
+            return $0.POST_TITLE.contains(target) || $0.POST_CONTENT.contains(target)
         }
         
         return result
     }
     
-    static func fetchAllDocuments() -> AnyPublisher<QuerySnapshot, Error> {
+    static func fetchDocuments() -> AnyPublisher<[Product], Error> {
         return Future() { promise in
-            db.collection("Product").getDocuments() { (querySnapshot, error) in
+            db.collection("Product").getDocuments(source: FirestoreSource.server) { (querySnapshot, error) in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    promise(.success(querySnapshot!))
+                    let products = querySnapshot?.documents.map { document in
+                        let data = document.data()
+                        return Product(id: document.documentID, IMAGES: data["IMAGES"] as! [String], AVAILABILITY: (data["AVAILABILITY"] != nil), LOCATION: data["LOCATION"] as! String, OWNER_ID: data["OWNER_ID"] as! String, POST_CONTENT: data["POST_CONTENT"] as! String, POST_TITLE: data["POST_TITLE"] as! String, PRICE: data["PRICE"] as! Double, PRODUCT_NAME: data["PRODUCT_NAME"] as! String, PRODUCT_TYPE: data["PRODUCT_TYPE"] as! String)
+                    }
+                    
+                    promise(.success(products!))
                 }
             }
         }
         .eraseToAnyPublisher()
     }
     
-    static func fetchDocument(documentID: String) -> AnyPublisher<(String, Product), Error> {
-        let docRef = db.collection("Product").document(documentID)
-        
+    static func addDocument(newProduct: Dictionary<String, Any>) -> AnyPublisher<Bool, Error> {
         return Future() { promise in
-            docRef.getDocument(as: Product.self) { result in
-                switch result {
-                case .success(let result):
-                    promise(.success((documentID, result)))
-                case .failure(let error):
-                    promise(.failure(error))
-                }
-            }
-        }
-        .eraseToAnyPublisher()
-    }
-    
-    static func fetchImage(imageName: String) -> AnyPublisher<UIImage?, Error> {
-        let storage = Storage.storage()
-        let gsReference = storage.reference(forURL: "gs://ios-demo-ae41b.appspot.com/")
-        let islandRef = gsReference.child(imageName)
-        
-        return Future() { promise in
-            islandRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(UIImage(data: data!)))
-                }
-            }
-        }
-        .eraseToAnyPublisher()
-    }
-    
-    static func writeDocument(product: Dictionary<String, Any>) -> AnyPublisher<Bool, Error> {
-        return Future() { promise in
-            db.collection("Product").document(UUID().uuidString).setData(product) { error in
+            db.collection("Product").document(UUID().uuidString).setData(newProduct) { error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
@@ -80,9 +55,27 @@ struct FireStoreModel {
         .eraseToAnyPublisher()
     }
     
-    static func removeDocument(documentID: String) -> AnyPublisher<Bool, Error> {
+    static func deleteDocument(id: String) -> AnyPublisher<Bool, Error> {
         return Future() { promise in
-            db.collection("Product").document(documentID).delete() { error in
+            db.collection("Product").document(id).delete() { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(true))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    static func uploadImage(dataToUpload data: Data) -> AnyPublisher<Bool, Error> {
+        //TODO: reduce image file size
+        let riversRef = gsReference.child("test.jpg")
+        return Future() { promise in
+            let metaData = StorageMetadata()
+            metaData.contentType = "image/jpg"
+            
+            riversRef.putData(data, metadata: metaData) { (metaData, error) in
                 if let error = error {
                     promise(.failure(error))
                 } else {

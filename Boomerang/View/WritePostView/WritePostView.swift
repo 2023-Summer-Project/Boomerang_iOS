@@ -10,10 +10,10 @@ import SwiftUI
 struct WritePostView: View {
     @EnvironmentObject var fireStoreViewModel: FireStoreViewModel
     @EnvironmentObject var authentifation: Authentication
-    @State var title: String = ""
-    @State var price: String = ""
-    @State var content: String = ""
-    @State var selectedImageData: Data?
+    @State private var title: String = ""
+    @State private var price: String = ""
+    @State private var content: String = ""
+    @State private var selectedImageData: Data?
     @Binding var showWritePostView: Bool
     
     var body: some View {

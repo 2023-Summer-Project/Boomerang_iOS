@@ -10,7 +10,7 @@ import SwiftUI
 struct ProductDetailView: View {
     @EnvironmentObject var authentication: Authentication
     @EnvironmentObject var fireStoreViewModel: FireStoreViewModel
-    @State var showDeleteAlert: Bool = false
+    @State private var showDeleteAlert: Bool = false
     
     var product: Product
     

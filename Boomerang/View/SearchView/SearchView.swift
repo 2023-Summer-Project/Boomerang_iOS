@@ -10,7 +10,7 @@ import SwiftUI
 struct SearchView: View {
     @EnvironmentObject var fireStoreViewModel: FireStoreViewModel
     @EnvironmentObject var authentication: Authentication
-    @State var search: String = ""
+    @State private var search: String = ""
     
     var body: some View {
         NavigationView {

@@ -10,8 +10,8 @@ import SwiftUI
 struct ProductListView: View {
     @EnvironmentObject var fireStore: FireStoreViewModel
     @EnvironmentObject var authentication: Authentication
-    @State var search: String = ""
-    @State var showWritePostView: Bool = false
+    @State private var search: String = ""
+    @State private var showWritePostView: Bool = false
     @Binding var showMainView: Bool
     
     var body: some View {

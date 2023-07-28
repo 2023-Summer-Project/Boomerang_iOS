@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 
 struct SelectImageView: View {
-    @State var selectedImage: PhotosPickerItem?
+    @State private var selectedImage: PhotosPickerItem?
     @Binding var selectedImageData: Data?
     
     var body: some View {

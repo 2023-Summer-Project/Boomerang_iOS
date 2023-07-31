@@ -13,7 +13,8 @@ struct WritePostView: View {
     @State private var title: String = ""
     @State private var price: String = ""
     @State private var content: String = ""
-    @State private var selectedImageData: Data?
+    @State private var showAlert: Bool = false
+    @State private var selectedImages: [UIImage] = []
     @Binding var showWritePostView: Bool
     
     var body: some View {
@@ -25,23 +26,34 @@ struct WritePostView: View {
                 
                 ContentView(content: $content)
                 
-                SelectImageView(selectedImageData: $selectedImageData)
+                SelectImageView(selectedImages: $selectedImages)
+                
+                InfoView()
             }
             .padding()
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing, content: {
                 Button(action: {
-                    fireStoreViewModel.addProduct(imageData: selectedImageData!, POST_CONTENT: content, POST_TITLE: title, PRICE: Int(price)!, OWNER_ID: authentifation.currentUser!.uid)
-                    showWritePostView = false
-                }, label: { Text("등록하기") })
+                    if price.isEmpty {
+                        self.showAlert = true
+                    } else {
+                        fireStoreViewModel.uploadProduct(images: selectedImages, POST_CONTENT: content, POST_TITLE: title, PRICE: Int(price)!, OWNER_ID: authentifation.currentUser!.uid)
+                        showWritePostView = false
+                    }
+                }, label: { Text("등록") })
             })
         }
+        .alert(isPresented: $showAlert, content: {
+            Alert(title: Text("가격을 입력하세요."))
+        })
     }
 }
 
 struct WritePostView_Previews: PreviewProvider {
     static var previews: some View {
         WritePostView(showWritePostView: .constant(true))
+            .environmentObject(Authentication())
+            .environmentObject(FireStoreViewModel())
     }
 }

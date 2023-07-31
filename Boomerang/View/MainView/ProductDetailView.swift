@@ -15,19 +15,24 @@ struct ProductDetailView: View {
     var product: Product
     
     var body: some View {
-        ScrollView {
-            AsyncImage(url: URL(string: product.IMAGES[1])) { image in
-                image
-                    .resizable()
-                    .frame(width: 400, height: 400)
-            } placeholder: {
-                ZStack {
-                    Rectangle()
-                        .fill(Color(red: 209 / 255, green: 209 / 255, blue: 209 / 255))
-                    ProgressView()
+        ScrollView {            
+            TabView {
+                ForEach(1..<product.IMAGES.count, id: \.self) { index in
+                    AsyncImage(url: URL(string: product.IMAGES[index])) { image in
+                        image
+                            .resizable()
+                            .frame(width: 400, height: 400)
+                    } placeholder: {
+                        ZStack {
+                            Rectangle()
+                                .fill(Color(red: 209 / 255, green: 209 / 255, blue: 209 / 255))
+                            ProgressView()
+                        }
+                    }
                 }
-                    .frame(width: 400, height: 400)
             }
+            .tabViewStyle(.page)
+            .frame(width: 400, height: 400)
             
             VStack(alignment: .leading) {
                 Text(product.POST_TITLE)

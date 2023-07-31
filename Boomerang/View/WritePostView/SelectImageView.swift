@@ -6,43 +6,67 @@
 //
 
 import SwiftUI
-import PhotosUI
 
 struct SelectImageView: View {
-    @State private var selectedImage: PhotosPickerItem?
-    @Binding var selectedImageData: Data?
+    @State private var showActionSheet: Bool = false
+    @State private var onCamera: Bool = false
+    @State private var onPhotoLibrary: Bool = false
+    @Binding var selectedImages: [UIImage]
     
     var body: some View {
         HStack {
-            if let image = selectedImageData, let uiImage = UIImage(data: image) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                
-            } else {
-                Image(systemName: "camera.circle")
-                    .resizable()
-                    .frame(width: 50, height: 50)
+            HStack {
+                ForEach(0..<selectedImages.count, id: \.self) { index in
+                    Image(uiImage: selectedImages[index])
+                        .resizable()
+                        .frame(width: 60, height: 60)
+                        .cornerRadius(10)
+                }
             }
             
-            PhotosPicker(selection: $selectedImage, matching: .images) { Text("사진 선택") }
-                .onChange(of: selectedImage) { newItem in
-                    Task {
-                        if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                            selectedImageData = data
-                        }
-                    }
-                }
-                .padding(.leading, 5)
+            if selectedImages.count < 5 {
+                Button(action: { self.showActionSheet = true }, label: {
+                    Image(systemName: "camera.circle")
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                        .padding([.leading, .trailing], -5)
+                        .foregroundColor(.black)
+                })
+                .buttonStyle(.bordered)
+                .frame(width: 60, height: 60)
+            }
             
             Spacer()
         }
-        .padding(.bottom, 30)
+        .actionSheet(isPresented: $showActionSheet) {
+            ActionSheet(
+                title: Text("이미지 선택하기"),
+                message: nil,
+                buttons: [
+                    .default(
+                        Text("카메라"),
+                        action: { onCamera = true }
+                    ),
+                    .default(
+                        Text("사진 앨범"),
+                        action: { onPhotoLibrary = true }
+                    ),
+                    .cancel()
+                ]
+            )
+        }
+        .sheet(isPresented: $onPhotoLibrary, content: {
+            ImagePickerView(selectedImages: $selectedImages, sourceType: .photoLibrary)
+        })
+        .fullScreenCover(isPresented: $onCamera, content: {
+            ImagePickerView(selectedImages: $selectedImages, sourceType: .camera)
+        })
+        //.padding(.top, 30)
     }
 }
 
 struct SelectImageView_Previews: PreviewProvider {
     static var previews: some View {
-        SelectImageView(selectedImageData: .constant(nil))
+        SelectImageView(selectedImages: .constant([UIImage()]))
     }
 }

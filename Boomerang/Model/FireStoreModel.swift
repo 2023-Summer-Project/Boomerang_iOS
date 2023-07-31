@@ -68,18 +68,32 @@ struct FireStoreModel {
         .eraseToAnyPublisher()
     }
     
-    static func uploadImage(dataToUpload data: Data) -> AnyPublisher<Bool, Error> {
-        //TODO: reduce image file size
-        let riversRef = gsReference.child("test.jpg")
+    static func uploadImage(dataToUpload image: UIImage) -> AnyPublisher<(StorageReference, String), Error> {
+        let fileName: String = String(Date().timeIntervalSince1970).replacingOccurrences(of: ".", with: "_")
+        let imageData = image.jpegData(compressionQuality: 1) ?? Data()
+        let riversRef = gsReference.child(fileName)
+        let metaData = StorageMetadata()
+        metaData.contentType = "image/jpeg"
+        
         return Future() { promise in
-            let metaData = StorageMetadata()
-            metaData.contentType = "image/jpg"
-            
-            riversRef.putData(data, metadata: metaData) { (metaData, error) in
+            riversRef.putData(imageData, metadata: metaData) { (metaData, error) in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    promise(.success(true))
+                    promise(.success((riversRef, fileName)))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    static func downloadURL(ref: StorageReference) -> AnyPublisher<URL, Error> {
+        return Future() { promise in
+            ref.downloadURL { (url, error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(url!))
                 }
             }
         }

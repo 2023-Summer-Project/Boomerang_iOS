@@ -22,7 +22,7 @@ struct MainView: View {
                 .environmentObject(authentication)
                 .environmentObject(fireStoreViewModel)
                 .tabItem {
-                    Label("홈", systemImage: "house")
+                    Image(systemName: "house")
                 }
                 .tag(0)
             
@@ -30,20 +30,20 @@ struct MainView: View {
                 .environmentObject(authentication)
                 .environmentObject(fireStoreViewModel)
                 .tabItem {
-                    Label("검색", systemImage: "magnifyingglass")
+                    Image(systemName: "magnifyingglass")
                 }
                 .tag(1)
             
             Text("")
                 .tabItem {
-                    Label("등록", systemImage: "plus.circle.fill")
+                    Image(systemName: "plus.app.fill")
                 }
                 .tag(2)
             
             
             MessageListView()
                 .tabItem {
-                    Label("채팅", systemImage: "paperplane.fill")
+                    Image(systemName: "paperplane.fill")
                 }
                 .badge(notificationCount)
                 .tag(3)
@@ -51,12 +51,13 @@ struct MainView: View {
             SettingView(showMainView: $showMainView)
                 .environmentObject(authentication)
                 .tabItem {
-                    Label("내정보", systemImage: "person.fill")
+                    Image(systemName: "person.fill")
                 }
                 .tag(4)
         }
         .onChange(of: selectedItem) { value in
             if value == 2 {
+                selectedItem = previousSelectedItem
                 showWritePost = true
             } else {
                 previousSelectedItem = value

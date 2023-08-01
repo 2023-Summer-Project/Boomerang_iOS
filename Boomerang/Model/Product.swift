@@ -11,7 +11,8 @@ import FirebaseFirestoreSwift
 
 struct Product: Codable, Hashable {
     var id: String
-    var IMAGES: [String]
+    var IMAGES_MAP: Dictionary<String, String>
+    var IMAGE_MAP_KEYS: [String]
     var AVAILABILITY: Bool    //1: true, 0: false
     var LOCATION: String
     var OWNER_ID: String

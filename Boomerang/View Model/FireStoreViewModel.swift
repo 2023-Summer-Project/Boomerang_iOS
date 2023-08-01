@@ -22,7 +22,7 @@ final class FireStoreViewModel: ObservableObject {
 //MARK: - fetch Data
 extension FireStoreViewModel {
     func fetchProduct() {
-        products.removeAll()
+        //products.removeAll()
         
         FireStoreModel.fetchDocuments()
             .sink(receiveCompletion: { completion in
@@ -42,7 +42,7 @@ extension FireStoreViewModel {
 //MARK: - add & delete data
 extension FireStoreViewModel {    
     func uploadProduct(images: [UIImage], POST_CONTENT: String, POST_TITLE: String, PRICE: Int, OWNER_ID: String) {
-        var imageURLs: [String] = [""]
+        var images_map: Dictionary<String, String> = Dictionary<String, String>()
         
         for image in images {
             FireStoreModel.uploadImage(dataToUpload: image)
@@ -64,12 +64,12 @@ extension FireStoreViewModel {
                             }
                         }, receiveValue: { url in
                             let stringURL: String = url.absoluteString
-                            imageURLs.append(stringURL)
+                            images_map[fileName] = stringURL
                             
-                            if images.count + 1 == imageURLs.count {
-                                let product: Dictionary<String, Any> = ["IMAGES": imageURLs, "AVAILABILITY": true, "LOCATION": "동백동", "PRODUCT_NAME": "", "PRODUCT_TYPE": "", "POST_CONTENT": POST_CONTENT, "POST_TITLE": POST_TITLE, "PRICE": PRICE, "OWNER_ID": OWNER_ID]
+                            if images.count == images_map.count {
+                                let product: Dictionary<String, Any> = ["IMAGES_MAP": images_map, "AVAILABILITY": true, "LOCATION": "동백동", "PRODUCT_NAME": "", "PRODUCT_TYPE": "", "POST_CONTENT": POST_CONTENT, "POST_TITLE": POST_TITLE, "PRICE": PRICE, "OWNER_ID": OWNER_ID]
                                 
-                                FireStoreModel.addDocument(newProduct: product)
+                                FireStoreModel.uploadDocument(newProduct: product)
                                     .sink(receiveCompletion: { completion in
                                         switch completion {
                                         case .finished:
@@ -77,8 +77,8 @@ extension FireStoreViewModel {
                                         case .failure(let error):
                                             print("write document failed: ", error)
                                         }
-                                    }, receiveValue: { _ in
-                                        print("Document successfully written!")
+                                    }, receiveValue: {
+                                        print("Document is successfully written!")
                                         self.fetchProduct()
                                     })
                                     .store(in: &self.cancellables)
@@ -90,19 +90,34 @@ extension FireStoreViewModel {
         }
     }
     
-    func deleteProduct(targetID: String) {
-        FireStoreModel.deleteDocument(id: targetID)
+    func deleteProduct(target: Product) {
+        FireStoreModel.deleteDocument(id: target.id)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    print("remove Document finished")
+                    print("delete Document finished")
                 case .failure(let error):
-                    print("remove Document failed: ", error)
+                    print("delete Document failed: ", error)
                 }
-            }, receiveValue: { _ in
-                print("Document successfully removed!")
+            }, receiveValue: {
+                print("Document is successfully deleted!")
             })
             .store(in: &self.cancellables)
+        
+        target.IMAGE_MAP_KEYS.forEach { key in
+            FireStoreModel.deleteImage(fileName: key)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("delete Image finished")
+                    case .failure(let error):
+                        print("delete Image failed: ", error)
+                    }
+                }, receiveValue: {
+                    print("Image is successfully deleted!")
+                })
+                .store(in: &self.cancellables)
+        }
     }
 }
 

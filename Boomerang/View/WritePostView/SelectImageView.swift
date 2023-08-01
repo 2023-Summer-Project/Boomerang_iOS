@@ -17,10 +17,20 @@ struct SelectImageView: View {
         HStack {
             HStack {
                 ForEach(0..<selectedImages.count, id: \.self) { index in
-                    Image(uiImage: selectedImages[index])
-                        .resizable()
-                        .frame(width: 60, height: 60)
-                        .cornerRadius(10)
+                    ZStack {
+                        Image(uiImage: selectedImages[index])
+                            .resizable()
+                            .frame(width: 60, height: 60)
+                            .cornerRadius(10)
+
+                        Image(systemName: "x.circle.fill")
+                            .foregroundColor(.gray)
+                            .offset(x: 30, y: -30)
+                            .onTapGesture {
+                                selectedImages.remove(at: index)
+                            }
+                    }
+                    .padding(.trailing, 5)
                 }
             }
             
@@ -61,7 +71,6 @@ struct SelectImageView: View {
         .fullScreenCover(isPresented: $onCamera, content: {
             ImagePickerView(selectedImages: $selectedImages, sourceType: .camera)
         })
-        //.padding(.top, 30)
     }
 }
 

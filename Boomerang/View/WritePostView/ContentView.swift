@@ -20,7 +20,7 @@ struct ContentView: View {
             TextField("물건에 대한 소개를 작성해 주세요.", text: $content)
                 .textFieldStyle(.roundedBorder)
         }
-        .padding(.bottom, 15)
+        .padding(.bottom, 10)
     }
 }
 

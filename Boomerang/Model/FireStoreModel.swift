@@ -32,7 +32,10 @@ struct FireStoreModel {
                 } else {
                     let products = querySnapshot?.documents.map { document in
                         let data = document.data()
-                        return Product(id: document.documentID, IMAGES: data["IMAGES"] as! [String], AVAILABILITY: (data["AVAILABILITY"] != nil), LOCATION: data["LOCATION"] as! String, OWNER_ID: data["OWNER_ID"] as! String, POST_CONTENT: data["POST_CONTENT"] as! String, POST_TITLE: data["POST_TITLE"] as! String, PRICE: data["PRICE"] as! Double, PRODUCT_NAME: data["PRODUCT_NAME"] as! String, PRODUCT_TYPE: data["PRODUCT_TYPE"] as! String)
+                        let images_map: Dictionary<String, String> = data["IMAGES_MAP"] as! Dictionary<String, String>
+                        let image_map_keys: Array<String> = images_map.keys.sorted(by: {$0 < $1})
+                        
+                        return Product(id: document.documentID, IMAGES_MAP: images_map,IMAGE_MAP_KEYS: image_map_keys, AVAILABILITY: (data["AVAILABILITY"] != nil), LOCATION: data["LOCATION"] as! String, OWNER_ID: data["OWNER_ID"] as! String, POST_CONTENT: data["POST_CONTENT"] as! String, POST_TITLE: data["POST_TITLE"] as! String, PRICE: data["PRICE"] as! Double, PRODUCT_NAME: data["PRODUCT_NAME"] as! String, PRODUCT_TYPE: data["PRODUCT_TYPE"] as! String)
                     }
                     
                     promise(.success(products!))
@@ -42,26 +45,26 @@ struct FireStoreModel {
         .eraseToAnyPublisher()
     }
     
-    static func addDocument(newProduct: Dictionary<String, Any>) -> AnyPublisher<Bool, Error> {
+    static func uploadDocument(newProduct: Dictionary<String, Any>) -> AnyPublisher<Void, Error> {
         return Future() { promise in
             db.collection("Product").document(UUID().uuidString).setData(newProduct) { error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    promise(.success(true))
+                    promise(.success(()))
                 }
             }
         }
         .eraseToAnyPublisher()
     }
     
-    static func deleteDocument(id: String) -> AnyPublisher<Bool, Error> {
+    static func deleteDocument(id: String) -> AnyPublisher<Void, Error> {
         return Future() { promise in
             db.collection("Product").document(id).delete() { error in
                 if let error = error {
                     promise(.failure(error))
                 } else {
-                    promise(.success(true))
+                    promise(.success(()))
                 }
             }
         }
@@ -81,6 +84,21 @@ struct FireStoreModel {
                     promise(.failure(error))
                 } else {
                     promise(.success((riversRef, fileName)))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    static func deleteImage(fileName: String) -> AnyPublisher<Void, Error> {
+        let riversRef = gsReference.child(fileName)
+        
+        return Future() { promise in
+            riversRef.delete { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
                 }
             }
         }

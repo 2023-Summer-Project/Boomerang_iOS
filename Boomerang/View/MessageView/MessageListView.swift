@@ -8,8 +8,22 @@
 import SwiftUI
 
 struct MessageListView: View {
+    @StateObject var realtimeDatabaseViewModel: RealtimeDatabaseViewModel = RealtimeDatabaseViewModel()
+    @State var messageInput: String = ""
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationView {
+            List {
+                ForEach(realtimeDatabaseViewModel.chatList) { chat in
+                    NavigationLink(destination: {
+                        MessageDetailView(chatId: chat.id)
+                            .environmentObject(realtimeDatabaseViewModel)
+                    }, label: { MessageListRowView(chat: chat) })
+                }
+            }
+            .listStyle(.plain)
+            .navigationTitle("채팅")
+        }
     }
 }
 

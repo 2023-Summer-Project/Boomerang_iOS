@@ -9,18 +9,19 @@ import SwiftUI
 import Firebase
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    FirebaseApp.configure()
-
-    return true
-  }
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        FirebaseApp.configure()
+        
+        return true
+    }
 }
 
 @main
 struct BoomerangApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var authentication: Authentication = Authentication()
+    @Environment(\.scenePhase) private var scenePhase    //Application Life Cycle variable
     
     var body: some Scene {
         WindowGroup {
@@ -37,6 +38,11 @@ struct BoomerangApp: App {
                 }
             }
             .navigationViewStyle(.stack)
+            .onChange(of: scenePhase) { _ in
+                //Task when change App Life Cycle
+                DirectoryManager.deleteTmpDirectory()
+                print("Temp Directory has been deleted")
+            }
         }
     }
 }

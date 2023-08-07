@@ -66,7 +66,7 @@ struct MainView: View {
         .sheet(isPresented: $showWritePost, onDismiss: {
             selectedItem = previousSelectedItem
         }, content: {
-            WritePostView()
+            WritePostView(showWritePost: $showWritePost)
                 .environmentObject(authentication)
                 .environmentObject(fireStoreViewModel)
         })

@@ -17,8 +17,9 @@ struct ContentView: View {
                 Spacer()
             }
             
-            TextField("물건에 대한 소개를 작성해 주세요.", text: $content)
+            TextField("물건에 대한 소개를 작성해 주세요.", text: $content, axis: .vertical)
                 .textFieldStyle(.roundedBorder)
+                .lineLimit(5, reservesSpace: true)
         }
         .padding(.bottom, 10)
     }

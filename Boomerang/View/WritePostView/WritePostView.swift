@@ -15,6 +15,7 @@ struct WritePostView: View {
     @State private var content: String = ""
     @State private var selectedImages: [UIImage] = []
     @State private var showAlert: Bool = false
+    @Binding var showWritePost: Bool
     
     var body: some View {
         ScrollView {
@@ -29,6 +30,7 @@ struct WritePostView: View {
                             showAlert = true
                         } else {
                             fireStoreViewModel.uploadProduct(images: selectedImages, POST_CONTENT: content, POST_TITLE: title, PRICE: Int(price)!, OWNER_ID: authentifation.currentUser!.uid)
+                            showWritePost = false
                         }
                     }, label: { Text("등록") })
                 }
@@ -55,7 +57,7 @@ struct WritePostView: View {
 
 struct WritePostView_Previews: PreviewProvider {
     static var previews: some View {
-        WritePostView()
+        WritePostView(showWritePost: .constant(true))
             .environmentObject(Authentication())
             .environmentObject(FireStoreViewModel())
     }

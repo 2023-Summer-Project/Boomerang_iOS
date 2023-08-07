@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import SwiftUI
 import FirebaseFirestoreSwift
+import FirebaseFirestore
 
 struct Product: Codable, Hashable {
     var id: String
@@ -21,4 +21,14 @@ struct Product: Codable, Hashable {
     var PRICE: Double
     var PRODUCT_NAME: String
     var PRODUCT_TYPE: String
+    var TIMESTAMP: Timestamp
+    var dateString: String {
+        let dateFormatter: DateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        return dateFormatter.string(from: TIMESTAMP.dateValue())
+    }
+    var dateDiff: Int {
+        return Int(Date().timeIntervalSince(TIMESTAMP.dateValue()))
+    }
 }

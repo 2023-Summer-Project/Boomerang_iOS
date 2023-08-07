@@ -22,7 +22,7 @@ struct ImagePickerView: UIViewControllerRepresentable {
         
         //this method will be called when an image is selected
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            if let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
                 target.selectedImages.append(image)
             }
             
@@ -34,7 +34,7 @@ struct ImagePickerView: UIViewControllerRepresentable {
     // Return an instance of UIImagePickerController from UIKit
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImagePickerView>) -> UIImagePickerController {
         let imagePicker = UIImagePickerController()
-        imagePicker.allowsEditing = false
+        imagePicker.allowsEditing = true
         imagePicker.sourceType = sourceType
         imagePicker.delegate = context.coordinator
         
@@ -48,3 +48,23 @@ struct ImagePickerView: UIViewControllerRepresentable {
         return Coordinator(self)
     }
 }
+
+//extension UIImage {
+//    func crop() -> UIImage {
+//        guard let cgImage = self.cgImage else {
+//            return self
+//        }
+//
+//        let sourceSize = self.size
+//        let sideLength = min(sourceSize.width, sourceSize.height)
+//        let xOffset = (sourceSize.width - 2100) / 2.0
+//        let yOffset = (sourceSize.height - 2100) / 2.0
+//        let cropRect = CGRect(x: xOffset, y: yOffset, width: 2100, height: 2100)
+//
+//        guard let croppedCgImage = cgImage.cropping(to: cropRect) else {
+//            return self
+//        }
+//
+//        return UIImage(cgImage: croppedCgImage, scale: self.scale, orientation: self.imageOrientation)
+//    }
+//}

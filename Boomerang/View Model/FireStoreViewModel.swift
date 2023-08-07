@@ -22,7 +22,7 @@ final class FireStoreViewModel: ObservableObject {
 //MARK: - fetch Data
 extension FireStoreViewModel {
     func fetchProduct() {
-        //products.removeAll()
+        products.removeAll()
         
         FireStoreModel.fetchDocuments()
             .sink(receiveCompletion: { completion in
@@ -45,6 +45,7 @@ extension FireStoreViewModel {
         var images_map: Dictionary<String, String> = Dictionary<String, String>()
         
         for image in images {
+            print(image.size.width, image.size.height)
             FireStoreModel.uploadImage(dataToUpload: image)
                 .sink(receiveCompletion: { completion in
                     switch completion {
@@ -67,7 +68,7 @@ extension FireStoreViewModel {
                             images_map[fileName] = stringURL
                             
                             if images.count == images_map.count {
-                                let product: Dictionary<String, Any> = ["IMAGES_MAP": images_map, "AVAILABILITY": true, "LOCATION": "동백동", "PRODUCT_NAME": "", "PRODUCT_TYPE": "", "POST_CONTENT": POST_CONTENT, "POST_TITLE": POST_TITLE, "PRICE": PRICE, "OWNER_ID": OWNER_ID]
+                                let product: Dictionary<String, Any> = ["IMAGES_MAP": images_map, "AVAILABILITY": true, "LOCATION": "동백동", "PRODUCT_NAME": "", "PRODUCT_TYPE": "", "POST_CONTENT": POST_CONTENT, "POST_TITLE": POST_TITLE, "PRICE": PRICE, "OWNER_ID": OWNER_ID, "TIMESTAMP": Date()]
                                 
                                 FireStoreModel.uploadDocument(newProduct: product)
                                     .sink(receiveCompletion: { completion in

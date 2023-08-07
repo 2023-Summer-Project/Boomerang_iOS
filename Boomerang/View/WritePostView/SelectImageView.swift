@@ -30,7 +30,7 @@ struct SelectImageView: View {
                                 selectedImages.remove(at: index)
                             }
                     }
-                    .padding(.trailing, 5)
+                    .padding(.trailing, 3) 
                 }
             }
             

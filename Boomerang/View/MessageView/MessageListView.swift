@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MessageListView: View {
-    @StateObject var realtimeDatabaseViewModel: RealtimeDatabaseViewModel = RealtimeDatabaseViewModel()
+    @ObservedObject var realtimeDatabaseViewModel: RealtimeDatabaseViewModel = RealtimeDatabaseViewModel()
     @State var messageInput: String = ""
     
     var body: some View {
@@ -16,13 +16,19 @@ struct MessageListView: View {
             List {
                 ForEach(realtimeDatabaseViewModel.chatList) { chat in
                     NavigationLink(destination: {
-                        MessageDetailView(chatId: chat.id)
+                        MessageDetailView(chat, chatId: chat.id)
                             .environmentObject(realtimeDatabaseViewModel)
                     }, label: { MessageListRowView(chat: chat) })
                 }
+                .onDelete(perform: { _ in
+                    //TODO: - Task of Remove chat
+                })
             }
             .listStyle(.plain)
             .navigationTitle("채팅")
+        }
+        .onAppear {
+            //realtimeDatabaseViewModel.getUserChats()
         }
     }
 }

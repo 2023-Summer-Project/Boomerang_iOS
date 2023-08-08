@@ -9,7 +9,7 @@ import Foundation
 
 struct Message {
     var message: String
-    var id: String
+    var user_uid: String
     var user_name: String
-    var time_stamp: String
+    var timestamp: String
 }

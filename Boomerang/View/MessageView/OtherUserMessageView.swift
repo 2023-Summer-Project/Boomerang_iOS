@@ -29,6 +29,6 @@ struct OtherUserMessageView: View {
 
 struct OtherUserMessageView_Previews: PreviewProvider {
     static var previews: some View {
-        OtherUserMessageView(message: Message(message: "상대 유저 테스트 입니다.", id: "AwhLiVkek2b4s2XwrggAkorn4nA3", user_name: "Ados", time_stamp: "1"))
+        OtherUserMessageView(message: Message(message: "상대 유저 테스트 입니다.", user_uid: "AwhLiVkek2b4s2XwrggAkorn4nA3", user_name: "Ados", timestamp: "1"))
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MessageInputView: View {
-    @EnvironmentObject var realtimeDatabaseViewModel: RealtimeDatabaseViewModel
+    @EnvironmentObject var messagesViewModel: MessagesViewModel
     @Binding var messageInput: String
     
     var chatId: String
@@ -19,7 +19,7 @@ struct MessageInputView: View {
                 .textFieldStyle(.roundedBorder)
             
             Button(action: {
-                realtimeDatabaseViewModel.uploadNewMessage(message: messageInput, chatId: chatId)
+                messagesViewModel.uploadNewMessage(message: messageInput)
                 messageInput = ""
             }, label: {
                 Image(systemName: "arrow.forward.circle.fill")
@@ -33,6 +33,6 @@ struct MessageInputView: View {
 struct MessageInputView_Previews: PreviewProvider {
     static var previews: some View {
         MessageInputView(messageInput: .constant(""), chatId: "")
-            .environmentObject(RealtimeDatabaseViewModel())
+            .environmentObject(MessagesViewModel(for: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023"))
     }
 }

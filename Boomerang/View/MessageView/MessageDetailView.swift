@@ -9,46 +9,49 @@ import SwiftUI
 import FirebaseAuth
 
 struct MessageDetailView: View {
-    @EnvironmentObject var realtimeDatabaseViewModel: RealtimeDatabaseViewModel
+    @StateObject var messagesViewModle: MessagesViewModel
     @State var messageInput: String = ""
+    @Binding var showTabbar: Bool
     
     var chatId: String
-    var chat: Chat
+    var chatInfo: Chat
     
     var sortedMessages: [Message] {        
-        realtimeDatabaseViewModel.messages[chatId, default: []]
+        messagesViewModle.messages[chatId, default: []]
             .sorted(by: { $0.timestamp < $1.timestamp })
-    }
-    
-    init(_ chat: Chat, chatId: String) {
-        self.chat = chat
-        self.chatId = chatId
     }
     
     var body: some View {
         VStack {
-            ScrollView {
+            ScrollView() {
                 ForEach(sortedMessages, id: \.timestamp) { message in
                     if message.user_uid == Auth.auth().currentUser?.uid {
                         UserMessageView(message: message)
+                            .padding(.trailing, 10)
                     } else {
                         OtherUserMessageView(message: message)
+                            .padding(.leading, 10)
                     }
                 }
             }
             
             MessageInputView(messageInput: $messageInput, chatId: chatId)
-                .environmentObject(realtimeDatabaseViewModel)
+                .environmentObject(messagesViewModle)
+                .padding()
         }
-        .padding()
-        .navigationTitle(chat.title)
+        .navigationTitle(chatInfo.title)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            showTabbar = false
+        }
+        .onDisappear {
+            showTabbar = true
+        }
     }
 }
 
 struct MessageDetailVie_Previews: PreviewProvider {
     static var previews: some View {
-        MessageDetailView(Chat(id: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023", last_message: "마지막 메시지", last_timestamp: "", title: "메세지 타이틀"), chatId: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023")
-            .environmentObject(RealtimeDatabaseViewModel())
+        MessageDetailView(messagesViewModle: MessagesViewModel(for: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023"),showTabbar: .constant(false),  chatId: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023", chatInfo: Chat(id: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023", last_message: "마지막 메시지", last_timestamp: "", title: "메세지 타이틀"))
     }
 }

@@ -11,7 +11,7 @@ struct MainView: View {
     @ObservedObject var fireStoreViewModel: FireStoreViewModel = FireStoreViewModel()
     @EnvironmentObject var authentication: Authentication
     @Binding var showMainView: Bool
-    @State private var notificationCount: Int = 99
+    @State private var notificationCount: Int = 1
     @State private var selectedItem: Int = 0
     @State private var previousSelectedItem: Int = 0
     @State private var showWritePost: Bool = false
@@ -63,9 +63,7 @@ struct MainView: View {
                 previousSelectedItem = value
             }
         }
-        .sheet(isPresented: $showWritePost, onDismiss: {
-            selectedItem = previousSelectedItem
-        }, content: {
+        .sheet(isPresented: $showWritePost, content: {
             WritePostView(showWritePost: $showWritePost)
                 .environmentObject(authentication)
                 .environmentObject(fireStoreViewModel)

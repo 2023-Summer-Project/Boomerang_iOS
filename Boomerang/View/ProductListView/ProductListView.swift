@@ -11,6 +11,7 @@ struct ProductListView: View {
     @EnvironmentObject var fireStore: FireStoreViewModel
     @EnvironmentObject var authentication: Authentication
     @State private var search: String = ""
+    @State private var showTabbar: Bool = true
     @Binding var showMainView: Bool
     
     var body: some View {
@@ -18,7 +19,7 @@ struct ProductListView: View {
             List {
                 ForEach(fireStore.products, id: \.self) { product in
                     ZStack {
-                        NavigationLink(destination: { ProductDetailView(product: product)
+                        NavigationLink(destination: { ProductDetailView(showTabbar: $showTabbar, product: product)
                                 .environmentObject(authentication)
                                 .environmentObject(fireStore)
                         }, label: {})
@@ -30,7 +31,6 @@ struct ProductListView: View {
                 }
             }
             .listStyle(.plain)
-            .toolbarColorScheme(.light, for: .bottomBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: { NotificationView() }, label: {
@@ -38,11 +38,13 @@ struct ProductListView: View {
                     })
                 }
             }
+            .toolbar(showTabbar ? .visible : .hidden, for: .tabBar)
             .refreshable {
                 //아래로 당겨서 refresh
                 fireStore.fetchProduct()
             }
         }
+        .navigationViewStyle(.stack)
     }
 }
 

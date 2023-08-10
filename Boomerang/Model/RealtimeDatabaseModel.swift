@@ -27,7 +27,7 @@ struct RealtimeDatabaseModel {
         .eraseToAnyPublisher()
     }
     
-    static func fetchChat(chatId: String) -> AnyPublisher<[String: String], Error> {
+    static func fetchChat(for chatId: String) -> AnyPublisher<[String: String], Error> {
         return Future() { promise  in
             ref.child("chat").child(chatId).getData(completion: { (error, snapshot) in
                 if let error = error {
@@ -40,11 +40,12 @@ struct RealtimeDatabaseModel {
         .eraseToAnyPublisher()
     }
     
-    static func fetchMessage(_ chatId: String) -> AnyPublisher<Message?, Never> {
+    static func fetchRealtimeMessage(for chatId: String) -> AnyPublisher<Message?, Never> {
         let subject = CurrentValueSubject<Message?, Never>(nil)    //nil 초기값 전달
         let handle = ref.child("messages").child(chatId).observe(.childAdded, with: { snapshot in
-            let message = snapshot.value as! [String: String]
-            subject.send(Message(message: message["message"]!, user_uid: message["user_uid"]!, user_name: message["user_name"]!, timestamp: message["timestamp"]!))
+            let message = snapshot.value as! [String: Any]
+            
+            subject.send(Message(message: message["message"]! as! String, user_uid: message["user_uid"]! as! String, user_name: message["user_name"]! as! String, timestamp: message["timestamp"]! as! Double))
             })
         
         return subject.handleEvents(receiveCancel: {
@@ -52,10 +53,10 @@ struct RealtimeDatabaseModel {
         }).eraseToAnyPublisher()
     }
     
-    static func uploadMessage(newMessage: String, chatId: String) -> AnyPublisher<Void, Error> {
+    static func uploadMessage(newMessage: String, to chatId: String) -> AnyPublisher<Void, Error> {
         //TODO: - modify User Name
         return Future() { promise in
-            ref.child("messages").child(chatId).child(UUID().uuidString).setValue(["message": newMessage, "timestamp": String(Date().timeIntervalSince1970), "user_uid": Auth.auth().currentUser!.uid, "user_name": "ksjs1111"] as [String : Any]) { (error, _) in
+            ref.child("messages").child(chatId).child(UUID().uuidString).setValue(["message": newMessage, "timestamp": Int(trunc(Date().timeIntervalSince1970 * 1000)), "user_uid": Auth.auth().currentUser!.uid, "user_name": "ksjs1111"] as [String : Any]) { (error, _) in
                 if let error = error {
                     promise(.failure(error))
                 } else {

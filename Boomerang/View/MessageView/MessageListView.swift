@@ -8,16 +8,15 @@
 import SwiftUI
 
 struct MessageListView: View {
-    @ObservedObject var realtimeDatabaseViewModel: RealtimeDatabaseViewModel = RealtimeDatabaseViewModel()
-    @State var messageInput: String = ""
+    @StateObject var chatViewModel: ChatViewModel = ChatViewModel()
+    @State var showTabbar: Bool = true
     
     var body: some View {
         NavigationView {
             List {
-                ForEach(realtimeDatabaseViewModel.chatList) { chat in
+                ForEach(chatViewModel.chatList) { chat in
                     NavigationLink(destination: {
-                        MessageDetailView(chat, chatId: chat.id)
-                            .environmentObject(realtimeDatabaseViewModel)
+                        MessageDetailView(messagesViewModle: MessagesViewModel(for: chat.id), showTabbar: $showTabbar, chatId: chat.id, chatInfo: chat)
                     }, label: { MessageListRowView(chat: chat) })
                 }
                 .onDelete(perform: { _ in
@@ -26,9 +25,7 @@ struct MessageListView: View {
             }
             .listStyle(.plain)
             .navigationTitle("채팅")
-        }
-        .onAppear {
-            //realtimeDatabaseViewModel.getUserChats()
+            .toolbar(showTabbar ? .visible : .hidden, for: .tabBar)
         }
     }
 }

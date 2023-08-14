@@ -8,15 +8,28 @@
 import SwiftUI
 
 struct MessageListView: View {
-    @StateObject var chatViewModel: ChatViewModel = ChatViewModel()
-    @State var showTabbar: Bool = true
+    @EnvironmentObject var chatViewModel: ChatViewModel
+    @Environment(\.colorScheme) private var colorScheme
+    @Binding var showTabbar: Bool
+    @Binding var showMessageDetail: Bool
+    @Binding var selectedProduct: Product?
+    
+    var sortedChatList: [Chat] {
+        chatViewModel.chatList.sorted(by: { $0.last_timestamp > $1.last_timestamp })
+    }
     
     var body: some View {
-        NavigationView {
+        ZStack {
+            NavigationLink(isActive: $showMessageDetail, destination: {
+                MessageDetailView(messagesViewModle: MessagesViewModel(for: nil), chatId: nil, showTabbar: $showTabbar, selectedProduct: $selectedProduct, messageTitle: selectedProduct?.PRODUCT_NAME ?? "제목")
+                    .environmentObject(chatViewModel)
+            }, label: {})
+            
             List {
-                ForEach(chatViewModel.chatList) { chat in
+                ForEach(sortedChatList) { chat in
                     NavigationLink(destination: {
-                        MessageDetailView(messagesViewModle: MessagesViewModel(for: chat.id), showTabbar: $showTabbar, chatId: chat.id, chatInfo: chat)
+                        MessageDetailView(messagesViewModle: MessagesViewModel(for: chat.id), chatId: chat.id, showTabbar: $showTabbar, selectedProduct: $selectedProduct, messageTitle: chat.title)
+                            .environmentObject(chatViewModel)
                     }, label: { MessageListRowView(chat: chat) })
                 }
                 .onDelete(perform: { _ in
@@ -25,13 +38,24 @@ struct MessageListView: View {
             }
             .listStyle(.plain)
             .navigationTitle("채팅")
-            .toolbar(showTabbar ? .visible : .hidden, for: .tabBar)
+            .safeAreaInset(edge: .top) {
+                HStack {
+                    Text("채팅")
+                        .font(.title2)
+                        .bold()
+                        .padding()
+                    
+                    Spacer()
+                }
+                .background(colorScheme == .light ? .white : .black)
+            }
         }
     }
 }
 
 struct MessageListView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageListView()
+        MessageListView(showTabbar: .constant(true), showMessageDetail: .constant(false), selectedProduct: .constant(nil))
+            .environmentObject(ChatViewModel())
     }
 }

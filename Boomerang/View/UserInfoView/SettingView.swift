@@ -9,27 +9,36 @@ import SwiftUI
 
 struct SettingView: View {
     @EnvironmentObject var authentication: Authentication
+    @Environment(\.colorScheme) private var colorScheme
     @Binding var showMainView: Bool
     
     var body: some View {
-        NavigationView {
-            List {
-                Section(header: Text("계정 정보 확인"), content: {
-                    NavigationLink(destination: { UserInfoView() }, label: { Text("내 정보 확인") })
+        List {
+            Section(header: Text("계정 정보 확인"), content: {
+                NavigationLink(destination: { UserInfoView() }, label: { Text("내 정보 확인") })
+            })
+            
+            Section(header: Text("로그인 관리"), content: {
+                Button(action: {
+                    authentication.signOut()
+                    showMainView = false
+                }, label: {
+                    Text("로그아웃")
+                        .foregroundColor(.red)
                 })
+            })
+        }
+        .listStyle(.grouped)
+        .safeAreaInset(edge: .top) {
+            HStack {
+                Text("내 정보")
+                    .font(.title2)
+                    .bold()
+                    .padding()
                 
-                Section(header: Text("로그인 관리"), content: {
-                    Button(action: {
-                        authentication.signOut()
-                        showMainView = false
-                    }, label: {
-                        Text("로그아웃")
-                            .foregroundColor(.red)
-                    })
-                })
+                Spacer()
             }
-            .navigationTitle("내 정보")
-            .navigationBarTitleDisplayMode(.large)
+            .background(colorScheme == .light ? .white : .black)
         }
     }
 }

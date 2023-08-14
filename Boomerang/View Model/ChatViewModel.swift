@@ -6,6 +6,7 @@
 //
 
 import Combine
+import FirebaseAuth
 
 final class ChatViewModel: ObservableObject {
     @Published var chatList: Array<Chat> = Array<Chat>()
@@ -13,44 +14,65 @@ final class ChatViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     init() {
-        getUserChats()
+        getUserChatList()
     }
-    
-    func getUserChats() {
-        //chatList.removeAll()
-        
-        RealtimeDatabaseModel.fetchChatList()
+}
+
+extension ChatViewModel {
+    //MARK: - User Chat Fetch
+    func getUserChatList() {
+        ChatModel.fetchChatList()
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    print("ChatroomList Fetch completed.")
+                    print("completed fetching the Chat List")
                 case .failure(let error):
-                    print("ChatRoomList Fetch error: ", error)
+                    print("Error: ", error)
                 }
-            }, receiveValue: { chatListDictionary in
-//                variable chatList is the Chat List the User belonging to
-//                chatList type - [String: Stirng]
-//                chatList ex - [firstChatId: "abcd"]
-                chatListDictionary.keys.forEach { key in
-                    RealtimeDatabaseModel.fetchChat(for: chatListDictionary[key]!)
+            }, receiveValue: { [weak self] chatId in
+                if let chatId {
+                    ChatModel.fetchChat(for: chatId)
                         .sink(receiveCompletion: { completion in
                             switch completion {
                             case .finished:
-                                print("Chat Fetch completed")
+                                print("completed fetching Chat")
                             case .failure(let error):
-                                print("Chat Fetch Error: ", error)
+                                print("Error: ", error)
                             }
                         }, receiveValue: { [weak self] chat in
-//                            variable chat has Chat Room information such as last message, last_timestamp, title etc
-//                            chat type - [String: String]
-//                            chat ex - [last_message: "test", last_timestamp: "1690968618738974", title: "테스트"]
-                            let chatData: Chat = Chat(id: chatListDictionary[key]!, last_message: chat["last_message"]!, last_timestamp: chat["last_timestamp"]!, title: chat["title"]!)
-                            
-                            self?.chatList.append(chatData)
+                            self?.chatList.append(chat)
                         })
-                        .store(in: &self.cancellables)
+                        .store(in: &self!.cancellables)
                 }
             })
             .store(in: &self.cancellables)
+    }
+}
+
+extension ChatViewModel {
+    //MARK: - Check Chat existence
+    func isExist(_ productId: String) -> Bool {
+        var result: Bool = false
+        
+        chatList.forEach { chat in
+            if chat.id.contains(productId) {
+                result = true
+            }
+        }
+        
+        return result
+    }
+}
+
+extension ChatViewModel {
+    //MARK: - update local Chat Info
+    func updateLocalChatInfo(_ message: String ,timestamp: Int, for chatId: String) {
+        for i in 0..<chatList.count {
+            if chatList[i].id == chatId {
+                chatList[i].last_message = message
+                chatList[i].last_timestamp = timestamp
+                break
+            }
+        }
     }
 }

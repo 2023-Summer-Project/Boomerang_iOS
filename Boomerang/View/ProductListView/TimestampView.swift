@@ -17,13 +17,6 @@ struct TimestampView: View {
     
     var body: some View {
         if product.dateDiff < 86400 {
-//            if product.dateDiff < 60 {
-//                Text("\(product.dateDiff)초 전")
-//            } else if product.dateDiff < 3600 {
-//                Text("\(product.dateDiff / 60)분 전")
-//            } else {
-//                Text("\(product.dateDiff / 3600)시간 \(product.dateDiff % 3600 / 60)분 전")
-//            }
             Text("\(product.dateDiff.toFormattedTime()) 전")
         } else {
             Text(product.dateString)

@@ -10,6 +10,6 @@ import Foundation
 struct Chat: Identifiable {
     var id: String
     var last_message: String
-    var last_timestamp: String
+    var last_timestamp: Int
     var title: String
 }

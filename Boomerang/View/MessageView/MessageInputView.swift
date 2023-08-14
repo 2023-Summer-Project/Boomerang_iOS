@@ -9,9 +9,12 @@ import SwiftUI
 
 struct MessageInputView: View {
     @EnvironmentObject var messagesViewModel: MessagesViewModel
-    @Binding var messageInput: String
+    @EnvironmentObject var chatViewModel: ChatViewModel
+    @State var messageInput: String = ""
+    @Binding var selectedProduct: Product?
+    @Binding var chatId: String?
     
-    var chatId: String
+    var chatTitle: String
     
     var body: some View {
         HStack {
@@ -19,7 +22,16 @@ struct MessageInputView: View {
                 .textFieldStyle(.roundedBorder)
             
             Button(action: {
-                messagesViewModel.uploadNewMessage(message: messageInput)
+                if let chatId = messagesViewModel.chatId {
+                    let now = Int(trunc(Date().timeIntervalSince1970 * 1000))
+                    
+                    messagesViewModel.uploadMessageToExsistingChat(message: messageInput, title: chatTitle, timestamp: now)
+                    
+                    chatViewModel.updateLocalChatInfo(messageInput, timestamp: now, for: chatId)
+                } else {                    
+                    self.chatId = messagesViewModel.uploadMessageToNewChat(from: selectedProduct!.OWNER_ID, for: selectedProduct!.id, productTitle: selectedProduct!.PRODUCT_NAME, message: messageInput)
+                }
+                
                 messageInput = ""
             }, label: {
                 Image(systemName: "arrow.forward.circle.fill")
@@ -32,7 +44,7 @@ struct MessageInputView: View {
 
 struct MessageInputView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageInputView(messageInput: .constant(""), chatId: "")
+        MessageInputView(messageInput: "", selectedProduct: .constant(nil), chatId: .constant("bad51940-15ec-4ea3-ac2f-9b79bf9aa023"), chatTitle: "제목은 여기에 표시됩니다.")
             .environmentObject(MessagesViewModel(for: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023"))
     }
 }

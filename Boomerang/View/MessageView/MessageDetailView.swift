@@ -10,14 +10,14 @@ import FirebaseAuth
 
 struct MessageDetailView: View {
     @StateObject var messagesViewModle: MessagesViewModel
-    @State var messageInput: String = ""
+    @EnvironmentObject var chatViewModel: ChatViewModel
+    @State var chatId: String?
     @Binding var showTabbar: Bool
-    
-    var chatId: String
-    var chatInfo: Chat
+    @Binding var selectedProduct: Product?
+    var messageTitle: String
     
     var sortedMessages: [Message] {        
-        messagesViewModle.messages[chatId, default: []]
+        messagesViewModle.messages[chatId ?? "", default: []]
             .sorted(by: { $0.timestamp < $1.timestamp })
     }
     
@@ -35,23 +35,17 @@ struct MessageDetailView: View {
                 }
             }
             
-            MessageInputView(messageInput: $messageInput, chatId: chatId)
+            MessageInputView(selectedProduct: $selectedProduct, chatId: $chatId, chatTitle: messageTitle)
                 .environmentObject(messagesViewModle)
                 .padding()
         }
-        .navigationTitle(chatInfo.title)
+        .navigationTitle(messageTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            showTabbar = false
-        }
-        .onDisappear {
-            showTabbar = true
-        }
     }
 }
 
 struct MessageDetailVie_Previews: PreviewProvider {
     static var previews: some View {
-        MessageDetailView(messagesViewModle: MessagesViewModel(for: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023"),showTabbar: .constant(false),  chatId: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023", chatInfo: Chat(id: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023", last_message: "마지막 메시지", last_timestamp: "", title: "메세지 타이틀"))
+        MessageDetailView(messagesViewModle: MessagesViewModel(for: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023"),chatId: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023", showTabbar: .constant(false), selectedProduct: .constant(nil), messageTitle: "메시지 타이틀")
     }
 }

@@ -11,5 +11,5 @@ struct Message {
     var message: String
     var user_uid: String
     var user_name: String
-    var timestamp: Double
+    var timestamp: Int
 }

@@ -15,6 +15,8 @@ struct WritePostView: View {
     @State private var content: String = ""
     @State private var selectedImages: [UIImage] = []
     @State private var showAlert: Bool = false
+    @State private var productName: String = ""
+    @State private var productType: String = ""
     @Binding var showWritePost: Bool
     
     var body: some View {
@@ -29,7 +31,7 @@ struct WritePostView: View {
                         if price.isEmpty || selectedImages.isEmpty {
                             showAlert = true
                         } else {
-                            fireStoreViewModel.uploadProduct(images: selectedImages, POST_CONTENT: content, POST_TITLE: title, PRICE: Int(price)!, OWNER_ID: authentifation.currentUser!.uid)
+                            fireStoreViewModel.uploadProduct(images: selectedImages, POST_CONTENT: content, POST_TITLE: title, PRICE: Int(price)!, OWNER_ID: authentifation.currentUser!.uid, PRODUCT_NAME: productName, PRODUCT_TYPE: productType)
                             showWritePost = false
                         }
                     }, label: { Text("등록") })
@@ -40,6 +42,13 @@ struct WritePostView: View {
                 TitleView(title: $title)
                 
                 PriceView(price: $price)
+                
+                HStack {
+                    ProductNameView(productName: $productName)
+                    
+                    ProductTypeView(productType: $productType)
+                }
+                .padding(.bottom, 10)
                 
                 ContentView(content: $content)
                 

@@ -1,5 +1,5 @@
 //
-//  FireStoreModel.swift
+//  FireStoreService.swift
 //  Boomerang
 //
 //  Created by 이정훈 on 2023/07/25.
@@ -11,7 +11,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 import FirebaseStorage
 
-struct FireStoreModel {
+struct FireStoreService {
     static private let db = Firestore.firestore()
     static private let storage = Storage.storage()
     static private let gsReference = storage.reference(forURL: "gs://ios-demo-ae41b.appspot.com/")
@@ -39,6 +39,21 @@ struct FireStoreModel {
                     }
                     
                     promise(.success(products!))
+                }
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    static func fetchDocument(for productId: String) -> AnyPublisher<String, Error> {
+        return Future() { promise in
+            db.collection("Product").document(productId).getDocument { (document, error) in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    if let document = document, document.exists {
+                        promise(.success(document["OWNER_ID"] as! String))
+                    }
                 }
             }
         }

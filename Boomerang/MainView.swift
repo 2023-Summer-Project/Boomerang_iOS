@@ -17,13 +17,13 @@ struct MainView: View {
     @State private var previousSelectedItem: Int = 0
     @State private var showWritePost: Bool = false
     @State private var showMessageDetail: Bool = false
-    @State private var showTabbar: Bool = true
+    @State private var showExistingMessageDetail: Bool = false
     @State private var selectedProduct: Product?
     
     var body: some View {
         NavigationView {
             TabView(selection: $selectedItem) {
-                ProductListView(showTabbar: $showTabbar, showMainView: $showMainView, selectedItem: $selectedItem, showMessageDetail: $showMessageDetail, selectedProduct: $selectedProduct)
+                ProductListView(selectedItem: $selectedItem, showMessageDetail: $showMessageDetail, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct)
                     .environmentObject(authentication)
                     .environmentObject(fireStoreViewModel)
                     .environmentObject(chatViewModel)
@@ -32,7 +32,7 @@ struct MainView: View {
                     }
                     .tag(0)
                 
-                SearchView(selectedItem: $selectedItem, showMessageDetail: $showMessageDetail, selectedProduct: $selectedProduct)
+                SearchView(selectedItem: $selectedItem, showMessageDetail: $showMessageDetail, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct)
                     .environmentObject(authentication)
                     .environmentObject(fireStoreViewModel)
                     .tabItem {
@@ -47,7 +47,7 @@ struct MainView: View {
                     .tag(2)
                 
                 
-                MessageListView(showTabbar: $showTabbar, showMessageDetail: $showMessageDetail, selectedProduct: $selectedProduct)
+                MessageListView(showMessageDetail: $showMessageDetail, showExistingMEssageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct)
                     .environmentObject(chatViewModel)
                     .tabItem {
                         Image(systemName: "paperplane.fill")
@@ -75,6 +75,11 @@ struct MainView: View {
                     .environmentObject(authentication)
                     .environmentObject(fireStoreViewModel)
             })
+            .onAppear {
+                let tabBarAppearance = UITabBarAppearance()
+                tabBarAppearance.configureWithDefaultBackground()
+                UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+            }
         }
         .navigationBarBackButtonHidden(true)
         .navigationViewStyle(.stack)

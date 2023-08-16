@@ -21,6 +21,7 @@ struct PriceView: View {
                     .textFieldStyle(.roundedBorder)
                     .keyboardType(.decimalPad)
                 Text("원")
+                    .padding(.leading, -5)
             }
         }
         .padding(.bottom, 10)

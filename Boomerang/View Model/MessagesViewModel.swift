@@ -31,7 +31,7 @@ final class MessagesViewModel: ObservableObject {
 //MARK: - Messages Fetch
 extension MessagesViewModel {
     func getMessages() {
-        MessageModel.fetchRealtimeMessage(of: chatId!)
+        MessageService.fetchRealtimeMessage(of: chatId!)
             .sink { [weak self] receiveValue in
                 //parameter type is Message
                 if let receiveValue, let self {
@@ -50,11 +50,11 @@ extension MessagesViewModel {
 extension MessagesViewModel {
     func uploadMessageToExsistingChat(message: String, title: String, timestamp: Int) {
         //upload Message
-        MessageModel.uploadMessage(newMessage: message, to: chatId!)
+        MessageService.uploadMessage(newMessage: message, to: chatId!)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    print("finished uploading New Message")
+                    print("successfully uploaded a New Message")
                 case .failure(let error):
                     print("Error: ", error)
                 }
@@ -63,11 +63,11 @@ extension MessagesViewModel {
             })
             .store(in: &self.cancellables)
         
-        MessageModel.updateChatInfo(message, title: title, updateTime: timestamp, to: chatId!)
+        MessageService.updateChatInfo(getSubString(message), title: title, updateTime: timestamp, to: chatId!)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    print("finished updating Chat Info")
+                    print("successfully updated a Chat Info")
                 case .failure(let error):
                     print("Error: ", error)
                 }
@@ -82,20 +82,20 @@ extension MessagesViewModel {
         
         chatId = userId + "_" + productId
         
-        ChatModel.createChat(for: productId, chatTitle: productTitle, last_message: message)
+        ChatService.createChat(for: productId, chatTitle: productTitle, last_message: message)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    print("finished creating a new Chat")
+                    print("successfully created a new Chat")
                 case .failure(let error):
                     print("Error: ", error)
                 }
             }, receiveValue: {
-                ChatModel.addChatId(self.chatId!, to: ownerId)
+                ChatService.addChatId(self.chatId!, to: ownerId)
                     .sink(receiveCompletion: { completion in
                         switch completion {
                         case .finished:
-                            print("finished adding a new Chat to Owner ChatList")
+                            print("successfully added a new Chat to Owner ChatList")
                         case .failure(let error):
                             print("Error: ", error)
                         }
@@ -103,12 +103,12 @@ extension MessagesViewModel {
                         print("add a new Chat to Owner ChatList")
                     })
                     .store(in: &self.cancellables)
-
-                ChatModel.addChatId(self.chatId!, to: userId)
+                
+                ChatService.addChatId(self.chatId!, to: userId)
                     .sink(receiveCompletion: { completion in
                         switch completion {
                         case .finished:
-                            print("finished adding a New Chat to User ChatList")
+                            print("successfully added a New Chat to User ChatList")
                         case .failure(let error):
                             print("Error: ", error)
                         }
@@ -119,11 +119,11 @@ extension MessagesViewModel {
             })
             .store(in: &cancellables)
         
-        MessageModel.uploadMessage(newMessage: message, to: chatId!)
+        MessageService.uploadMessage(newMessage: message, to: chatId!)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    print("finished uploading a New Message")
+                    print("successfully uploaded a New Message")
                 case .failure(let error):
                     print("Error: ", error)
                 }
@@ -133,5 +133,16 @@ extension MessagesViewModel {
             .store(in: &self.cancellables)
         
         return chatId!
+    }
+    
+    private func getSubString(_ message: String) -> String {
+        if message.count > 30 {
+            let startIndex = message.startIndex
+            let lastIndex = message.index(startIndex, offsetBy: 29)
+            
+            return String(message[startIndex...lastIndex]) + "..."
+        } else {
+            return message
+        }
     }
 }

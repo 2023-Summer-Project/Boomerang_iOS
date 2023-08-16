@@ -1,5 +1,5 @@
 //
-//  MessageModel.swift
+//  MessageService.swift
 //  Boomerang
 //
 //  Created by 이정훈 on 2023/08/10.
@@ -9,7 +9,7 @@ import Combine
 import FirebaseDatabase
 import FirebaseAuth
 
-struct MessageModel {
+struct MessageService {
     static var ref: DatabaseReference = Database.database().reference()
     
     static func fetchRealtimeMessage(of chatId: String) -> AnyPublisher<Message?, Never> {

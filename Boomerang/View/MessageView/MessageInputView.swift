@@ -23,11 +23,7 @@ struct MessageInputView: View {
             
             Button(action: {
                 if let chatId = messagesViewModel.chatId {
-                    let now = Int(trunc(Date().timeIntervalSince1970 * 1000))
-                    
-                    messagesViewModel.uploadMessageToExsistingChat(message: messageInput, title: chatTitle, timestamp: now)
-                    
-                    chatViewModel.updateLocalChatInfo(messageInput, timestamp: now, for: chatId)
+                    messagesViewModel.uploadMessageToExsistingChat(message: messageInput, title: chatTitle, timestamp: Int(trunc(Date().timeIntervalSince1970 * 1000)))
                 } else {                    
                     self.chatId = messagesViewModel.uploadMessageToNewChat(from: selectedProduct!.OWNER_ID, for: selectedProduct!.id, productTitle: selectedProduct!.PRODUCT_NAME, message: messageInput)
                 }

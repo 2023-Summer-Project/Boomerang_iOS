@@ -20,8 +20,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct BoomerangApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject var authentication: Authentication = Authentication()
-    @Environment(\.scenePhase) private var scenePhase    //Application Life Cycle variable
+    @ObservedObject var authentication: Authentication = Authentication()
     
     var body: some Scene {
         WindowGroup {
@@ -38,11 +37,6 @@ struct BoomerangApp: App {
                 }
             }
             .navigationViewStyle(.stack)
-            .onChange(of: scenePhase) { _ in
-                //Task when change App Life Cycle
-                DirectoryManager.deleteTmpDirectory()
-                print("Temp Directory has been deleted")
-            }
         }
     }
 }

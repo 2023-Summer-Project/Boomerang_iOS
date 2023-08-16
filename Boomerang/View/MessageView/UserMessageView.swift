@@ -20,7 +20,7 @@ struct UserMessageView: View {
             
             Text(message.message)
                 .padding(10)
-                .background(.blue)
+                .background(.indigo)
                 .foregroundColor(.white)
                 .cornerRadius(13)
         }

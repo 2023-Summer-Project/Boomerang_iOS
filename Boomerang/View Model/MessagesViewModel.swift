@@ -21,7 +21,7 @@ final class MessagesViewModel: ObservableObject {
     
     init(for chatId: String?) {
         self.chatId = chatId
-        
+
         if self.chatId != nil {
             getMessages()
         }

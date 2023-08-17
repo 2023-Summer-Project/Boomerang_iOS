@@ -9,17 +9,51 @@ import SwiftUI
 import FirebaseAuth
 
 struct UserInfoView: View {
+    @Binding var userInfo: UserInfo?
+    
     var body: some View {
-        if let user = Auth.auth().currentUser {
-            Text(user.email!)
-        } else {
-            EmptyView()
+        VStack {
+            HStack {
+                AsyncImage(url: URL(string: userInfo?.userProfileImage ?? ""), content: { image in
+                    image
+                        .resizable()
+                        .clipShape(Circle())
+                        .frame(width: 70, height: 70)
+                        .padding(.trailing, 6)
+                }, placeholder: {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .foregroundColor(.gray)
+                        .frame(width: 70, height: 70)
+                        .padding(.trailing, 10)
+                })
+                
+                VStack(alignment: .leading) {
+                    Text(userInfo?.userName ?? "")
+                        .font(.title2)
+                        .bold()
+                    
+                    Text(userInfo?.userEmail ?? "")
+                        .font(.body)
+                }
+                
+                Spacer()
+            }
+            .padding([.leading, .top, .bottom])
+            
+            Button(action: {}, label: {
+                Text("회원정보 수정")
+            })
+            .padding([.leading, .bottom, .trailing])
+            
         }
+        .background(.indigo)
+        //.cornerRadius(10)
     }
 }
 
 struct UserInfoView_Previews: PreviewProvider {
     static var previews: some View {
-        UserInfoView()
+        UserInfoView(userInfo: .constant(UserInfo(userName: "", userEmail: "", userProfileImage: "")))
     }
 }

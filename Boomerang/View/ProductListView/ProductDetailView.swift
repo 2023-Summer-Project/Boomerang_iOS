@@ -13,6 +13,7 @@ struct ProductDetailView: View {
     @EnvironmentObject var authentication: Authentication
     @EnvironmentObject var fireStoreViewModel: FireStoreViewModel
     @EnvironmentObject var chatViewModel: ChatViewModel
+    @Environment(\.dismiss) var dismiss
     @State private var showDeleteAlert: Bool = false
     @Binding var showMessageDetail: Bool
     @Binding var showExistingMessageDetail: Bool
@@ -28,7 +29,7 @@ struct ProductDetailView: View {
                     AsyncImage(url: URL(string: product.IMAGES_MAP[key]!)) { image in
                         image
                             .resizable()
-                            .frame(width: 400, height: 400)
+                            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
                     } placeholder: {
                         ZStack {
                             Rectangle()
@@ -39,7 +40,7 @@ struct ProductDetailView: View {
                 }
             }
             .tabViewStyle(.page)
-            .frame(width: 400, height: 400)
+            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
             
             VStack(alignment: .leading) {
                 Group {
@@ -81,11 +82,6 @@ struct ProductDetailView: View {
                         .font(.system(size: 16))
                         .padding(.bottom)
                 }
-                
-                NavigationLink(isActive: $showMessageDetail, destination: {
-                    MessageDetailView(messagesViewModle: MessagesViewModel(for: nil), chatId: nil, selectedProduct: $selectedProduct, messageTitle: selectedProduct?.PRODUCT_NAME ?? "제목")
-                        .environmentObject(chatViewModel)
-                }, label: {})
             }
             .padding([.leading, .trailing])
             
@@ -128,8 +124,8 @@ struct ProductDetailView: View {
                         selectedProduct = product
                         
                         if chatViewModel.isExist(product.id) {
-                            showExistingMessageDetail = true
                             selectedItem = 3
+                            showExistingMessageDetail = true
                         } else {
                             showMessageDetail = true
                         }
@@ -143,6 +139,10 @@ struct ProductDetailView: View {
                 }
             }
         }
+        .navigationDestination(isPresented: $showMessageDetail, destination: {
+            MessageDetailView(messagesViewModel: MessagesViewModel(for: nil), chatId: nil, selectedProduct: $selectedProduct, messageTitle: selectedProduct?.PRODUCT_NAME ?? "")
+                .environmentObject(chatViewModel)
+        })
         .alert("경고", isPresented: $showDeleteAlert) {
             Button("Delete", role: .destructive) {
                 fireStoreViewModel.deleteProduct(target: product)

@@ -22,7 +22,7 @@ struct MessageInputView: View {
                 .textFieldStyle(.roundedBorder)
             
             Button(action: {
-                if let chatId = messagesViewModel.chatId {
+                if messagesViewModel.chatId != nil {
                     messagesViewModel.uploadMessageToExsistingChat(message: messageInput, title: chatTitle, timestamp: Int(trunc(Date().timeIntervalSince1970 * 1000)))
                 } else {                    
                     self.chatId = messagesViewModel.uploadMessageToNewChat(from: selectedProduct!.OWNER_ID, for: selectedProduct!.id, productTitle: selectedProduct!.PRODUCT_NAME, message: messageInput)

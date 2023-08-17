@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SignInView: View {  
+struct SignInView: View {
     @EnvironmentObject var authentication: Authentication
     @Environment(\.colorScheme) var colorScheme
     @State private var inputEmail: String = ""
@@ -43,13 +43,15 @@ struct SignInView: View {
                         }
                     }
                 }, label: {
-                    Text("로그인")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 158)
-                        .padding(.vertical, 10)
-                        .background(Color.blue)
-                        .cornerRadius(10)
+                    HStack {
+                        Text("로그인")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                    .frame(width: UIScreen.main.bounds.width - 30)
+                    .background(Color.indigo)
+                    .cornerRadius(10)
                 })
                 .padding(.bottom, 10)
                 .alert("이메일이 존재하지 않거나 비밀번호가 일치하지 않습니다.", isPresented: $showAlert) {
@@ -58,24 +60,21 @@ struct SignInView: View {
                 
                 Divider()
                 
-                Button(action: { showSignUpView = true }) {
-                    Text("회원가입")
-                        .font(.headline)
-                }
-                .padding(.top, 10)
-                
-                NavigationLink(isActive: $showMainView, destination: {
-                    MainView(showMainView: $showMainView)
-                        .environmentObject(authentication)
-                }, label: {})
-                
-                NavigationLink(isActive: $showSignUpView, destination: {
+                NavigationLink(destination: {
                     SignUpView1()
                         .environmentObject(authentication)
-                }, label: {})
+                }, label: {
+                    Text("회원가입")
+                        .font(.headline)
+                        .padding(.top, 10)
+                })
             }
             .padding()
         }
+        .navigationDestination(isPresented: $showMainView, destination: {
+            MainView(showMainView: $showMainView)
+                .environmentObject(authentication)
+        })
     }
 }
 

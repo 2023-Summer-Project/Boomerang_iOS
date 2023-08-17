@@ -9,14 +9,14 @@ import SwiftUI
 import FirebaseAuth
 
 struct MessageDetailView: View {
-    @StateObject var messagesViewModle: MessagesViewModel
+    @StateObject var messagesViewModel: MessagesViewModel
     @EnvironmentObject var chatViewModel: ChatViewModel
     @State var chatId: String?
     @Binding var selectedProduct: Product?
     var messageTitle: String
     
     var sortedMessages: [Message] {        
-        messagesViewModle.messages[chatId ?? "", default: []]
+        messagesViewModel.messages[chatId ?? "", default: []]
             .sorted(by: { $0.timestamp < $1.timestamp })
     }
     
@@ -47,7 +47,7 @@ struct MessageDetailView: View {
             }
             
             MessageInputView(selectedProduct: $selectedProduct, chatId: $chatId, chatTitle: messageTitle)
-                .environmentObject(messagesViewModle)
+                .environmentObject(messagesViewModel)
                 .environmentObject(chatViewModel)
                 .padding([.leading, .bottom, .trailing])
                 .padding(.top, 3)
@@ -60,7 +60,7 @@ struct MessageDetailView: View {
 
 struct MessageDetailVie_Previews: PreviewProvider {
     static var previews: some View {
-        MessageDetailView(messagesViewModle: MessagesViewModel(for: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023"),chatId: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023", selectedProduct: .constant(nil), messageTitle: "메시지 타이틀")
+        MessageDetailView(messagesViewModel: MessagesViewModel(for: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023"),chatId: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023", selectedProduct: .constant(nil), messageTitle: "메시지 타이틀")
             .environmentObject(ChatViewModel())
     }
 }

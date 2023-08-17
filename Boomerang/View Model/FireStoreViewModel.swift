@@ -22,6 +22,8 @@ final class FireStoreViewModel: ObservableObject {
 //MARK: - fetch Data
 extension FireStoreViewModel {
     func fetchProduct() {
+        self.products.removeAll()
+        
         FireStoreService.fetchDocuments()
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -33,7 +35,6 @@ extension FireStoreViewModel {
                     print("Error fetching documents: ", error)
                 }
             }, receiveValue: { products in
-                //self.products.removeAll()
                 self.products = products
             })
             .store(in: &self.cancellables)

@@ -8,20 +8,23 @@
 import SwiftUI
 
 struct SignUpView2: View {
+    @StateObject var userViewModel: UserInfoViewModel = UserInfoViewModel()
     @EnvironmentObject var authentication: Authentication
     @State var userEmail: String
     @State private var userName: String = ""
     @State private var inputPw1: String = ""
     @State private var inputPw2: String = ""
+    @State private var showMainView: Bool = false
     
     var body: some View {
         Group {
-            VStack {
+            VStack(alignment: .leading) {
                 HStack {
                     Image(systemName: "2.circle")
                     Text("- 정보 입력")
                 }
-                .font(.title2)
+                .font(.title)
+                .fontWeight(.medium)
                 .padding(.bottom)
                 
                 HStack {
@@ -34,6 +37,7 @@ struct SignUpView2: View {
                     .textFieldStyle(.roundedBorder)
             }
             .padding()
+            .navigationBarBackButtonHidden(true)
         }
         
         Group {
@@ -101,17 +105,31 @@ struct SignUpView2: View {
             Button(action: {
                 if inputPw1.count >= 6 && inputPw1 == inputPw2 {
                     authentication.updatePw(email: userEmail, password: inputPw1)
+                    
+                    userViewModel.uploadUserInfo(userEmail, userName)
+                    
+                    showMainView = true
                 } else {
                     //비밀번호가 일치하지 않거나 비밀번호가 6자리 미만일때
                 }
-            }, label: { Text("다음") })
-            .buttonStyle(.bordered)
+            }, label: {
+                HStack {
+                    Text("다음")
+                        .foregroundColor(.white)
+                        .padding()
+                }
+                .frame(width: UIScreen.main.bounds.width - 30)
+                .background(Color.indigo)
+                .cornerRadius(10) })
         }
+        .navigationDestination(isPresented: $showMainView, destination: { MainView(showMainView: $showMainView) })
     }
 }
 
 struct SignUpView2_Previews: PreviewProvider {
     static var previews: some View {
         SignUpView2(userEmail: "admin@boomerang.com")
+            .environmentObject(Authentication())
+            .environmentObject(UserInfoViewModel())
     }
 }

@@ -24,18 +24,6 @@ final class Authentication: ObservableObject {
         Auth.auth().currentUser
     }
     
-    //MARK: - Sign In Method
-//    func signIn(userEmail: String, userPw: String, completion: @escaping (Bool) -> Void) {
-//        //로그인 시도
-//        Auth.auth().signIn(withEmail: userEmail, password: userPw) { (user, error) in
-//            if user != nil {
-//                completion(true)
-//            } else {
-//                completion(false)
-//            }
-//        }
-//    }
-    
     //MARK: - Sign In Method with async await
     func signIn(userEmail: String, userPw: String) async -> Bool {
         do {
@@ -52,7 +40,7 @@ final class Authentication: ObservableObject {
         let firebaseAuth = Auth.auth()
         
         do {
-            try firebaseAuth.signOut()
+            try firebaseAuth.signOut()            
         } catch let signOutError as NSError {
             print("Error signing out: %@", signOutError)
         }

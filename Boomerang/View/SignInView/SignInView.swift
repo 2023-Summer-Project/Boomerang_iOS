@@ -61,7 +61,7 @@ struct SignInView: View {
                 Divider()
                 
                 NavigationLink(destination: {
-                    SignUpView1()
+                    SignUpView1(showMainView: $showMainView)
                         .environmentObject(authentication)
                 }, label: {
                     Text("회원가입")

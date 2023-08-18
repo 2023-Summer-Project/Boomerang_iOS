@@ -14,7 +14,7 @@ struct SignUpView2: View {
     @State private var userName: String = ""
     @State private var inputPw1: String = ""
     @State private var inputPw2: String = ""
-    @State private var showMainView: Bool = false
+    @Binding var showMainView: Bool
     
     var body: some View {
         Group {
@@ -114,7 +114,7 @@ struct SignUpView2: View {
                 }
             }, label: {
                 HStack {
-                    Text("다음")
+                    Text("시작하기")
                         .foregroundColor(.white)
                         .padding()
                 }
@@ -122,13 +122,12 @@ struct SignUpView2: View {
                 .background(Color.indigo)
                 .cornerRadius(10) })
         }
-        .navigationDestination(isPresented: $showMainView, destination: { MainView(showMainView: $showMainView) })
     }
 }
 
 struct SignUpView2_Previews: PreviewProvider {
     static var previews: some View {
-        SignUpView2(userEmail: "admin@boomerang.com")
+        SignUpView2(userEmail: "admin@boomerang.com", showMainView: .constant(false))
             .environmentObject(Authentication())
             .environmentObject(UserInfoViewModel())
     }

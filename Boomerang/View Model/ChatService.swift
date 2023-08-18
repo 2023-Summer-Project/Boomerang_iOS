@@ -7,6 +7,7 @@
 
 
 import Combine
+import Foundation
 import FirebaseDatabase
 import FirebaseAuth
 
@@ -41,9 +42,25 @@ struct ChatService {
         }).eraseToAnyPublisher()
     }
     
-    static func createChat(for productId: String, chatTitle: String, last_message: String) -> AnyPublisher<Void, Error> {
+    static func createChat(for chatId: String, chatTitle: String, last_message: String, newMessage: String, senderName: String) -> AnyPublisher<Void, Error> {
         return Future() { promise in
-            ref.child("chat").child(Auth.auth().currentUser!.uid + "_" + productId).setValue(["last_message": last_message, "last_timestamp": Int(trunc(Date().timeIntervalSince1970 * 1000)), "title": chatTitle] as [String : Any]) { (error, _) in
+            let messageUUID: String = UUID().uuidString
+            let splitedString: [String] = chatId.components(separatedBy: "_")
+            let senderId: String = splitedString[0]
+            let receiverId: String = splitedString[1]
+            let childUpdates = [
+                "chat/\(chatId)/last_message": last_message,
+                "chat/\(chatId)/last_timestamp": Int(trunc(Date().timeIntervalSince1970 * 1000)),
+                "chat/\(chatId)/title": chatTitle,
+                "user/\(senderId)/chat_list/\(chatId)": "value",
+                "user/\(receiverId)/chat_list/\(chatId)": "value",
+                "messages/\(chatId)/\(messageUUID)/message": newMessage,
+                "messages/\(chatId)/\(messageUUID)/timestamp": Int(trunc(Date().timeIntervalSince1970 * 1000)),
+                "messages/\(chatId)/\(messageUUID)/user_uid": senderId,
+                "messages/\(chatId)/\(messageUUID)/user_name": senderName
+            ] as [String : Any]
+            
+            ref.updateChildValues(childUpdates) { (error, _) in
                 if let error = error {
                     promise(.failure(error))
                 } else {
@@ -55,40 +72,17 @@ struct ChatService {
     }
     
     static func removeChat(for chatId: String) {
-        let productId: String = chatId.components(separatedBy: "_")[1]
+        let splitedString: [String] = chatId.components(separatedBy: "_")
+        let senderId: String = splitedString[1]
+        let receiverId: String = splitedString[0]
         
-        FireStoreService.fetchDocument(for: productId)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    print("successfully removed a Chat")
-                case .failure(let error):
-                    print("Error: ", error)
-                }
-            }, receiveValue: { otherUserId in
-                let userId: String = Auth.auth().currentUser!.uid
-                let childUpdates: [String: Any?] = [
-                    "/user/\(userId)/chat_list/\(chatId)": nil,
-                    "/user/\(otherUserId)/chat_list/\(chatId)": nil,
-                    "/chat/\(chatId)": nil,
-                    "/messages/\(chatId)": nil
-                ]
-                
-                ref.updateChildValues(childUpdates as [AnyHashable : Any])
-            })
-            .store(in: &cancellables)
-    }
-            
-    static func addChatId(_ chatId: String, to userId: String) -> AnyPublisher<Void, Error> {
-        return Future() { promise in
-            ref.child("user").child(userId).child("chat_list").child(chatId).setValue("value") { (error, _) in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
-        }
-        .eraseToAnyPublisher()
+        let childUpdates: [String: Any?] = [
+            "/user/\(receiverId)/chat_list/\(chatId)": nil,
+            "/user/\(senderId)/chat_list/\(chatId)": nil,
+            "/chat/\(chatId)": nil,
+            "/messages/\(chatId)": nil
+        ]
+        
+        ref.updateChildValues(childUpdates as [AnyHashable : Any])
     }
 }

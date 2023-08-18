@@ -12,6 +12,10 @@ final class UserInfoViewModel: ObservableObject {
     
     private var cancellables = Set<AnyCancellable>()
     
+    init() {
+        getUserInfo()
+    }
+    
     func getUserInfo() {
         UserInfoService.fetchUserInfo()
             .sink(receiveCompletion: { completion in

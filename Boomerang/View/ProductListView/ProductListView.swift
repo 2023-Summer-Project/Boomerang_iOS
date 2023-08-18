@@ -11,6 +11,7 @@ struct ProductListView: View {
     @EnvironmentObject var fireStore: FireStoreViewModel
     @EnvironmentObject var authentication: Authentication
     @EnvironmentObject var chatViewModel: ChatViewModel
+    @EnvironmentObject var userInfoViewModel: UserInfoViewModel
     @Environment(\.colorScheme) private var colorScheme
     @State private var search: String = ""
     @Binding var selectedItem: Int
@@ -19,42 +20,43 @@ struct ProductListView: View {
     @Binding var selectedProduct: Product?
     
     var body: some View {
-        ZStack {
-            Color("background")
-                .ignoresSafeArea(.all)
-            
-            List {
-                ForEach(fireStore.products, id: \.self) { product in
-                    ZStack {
-                        NavigationLink(destination: { ProductDetailView(showMessageDetail: $showMessageDetail, showExistingMessageDetail: $showExistingMessageDetail, selectedItem: $selectedItem, selectedProduct: $selectedProduct, product: product)
-                                .environmentObject(authentication)
-                                .environmentObject(fireStore)
-                                .environmentObject(chatViewModel)
-                        }, label: {})
-                        .opacity(0.0)
-                        ProductListRowView(product: product)
+        List {
+            ForEach(fireStore.products, id: \.self) { product in
+                ZStack {
+                    NavigationLink(destination: { ProductDetailView(showMessageDetail: $showMessageDetail, showExistingMessageDetail: $showExistingMessageDetail, selectedItem: $selectedItem, selectedProduct: $selectedProduct, product: product)
+                            .environmentObject(authentication)
                             .environmentObject(fireStore)
-                    }
-                    .listRowBackground(Color("background"))
-                    .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
+                            .environmentObject(chatViewModel)
+                            .environmentObject(userInfoViewModel)
+                    }, label: {})
+                    .opacity(0.0)
+                    ProductListRowView(product: product)
+                        .environmentObject(fireStore)
                 }
+                .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
             }
-            .scrollContentBackground(.hidden)
-            .listStyle(.plain)
-            .safeAreaInset(edge: .top, content: {
-                HStack {
-                    Text("둘러보기")
-                        .font(.title2)
-                        .bold()
-                        .padding()
-                    Spacer()
-                }
-                .background(colorScheme == .light ? .white : Color("background"))
-            })
-            .refreshable {
-                //아래로 당겨서 refresh
-                fireStore.fetchProduct()
+        }
+        .scrollContentBackground(.hidden)
+        .listStyle(.plain)
+        .safeAreaInset(edge: .top, content: {
+            HStack {
+                Text("둘러보기")
+                    .bold()
+                Spacer()
+                
+                NavigationLink(destination: {
+                    NotificationView()
+                }, label: {
+                    Image(systemName: "bell.fill")
+                })
             }
+            .font(.title2)
+            .padding()
+            .background(colorScheme == .light ? .white : .black)
+        })
+        .refreshable {
+            //아래로 당겨서 refresh
+            fireStore.fetchProduct()
         }
     }
 }
@@ -65,5 +67,6 @@ struct ProductListView_Previews: PreviewProvider {
             .environmentObject(Authentication())
             .environmentObject(FireStoreViewModel())
             .environmentObject(ChatViewModel())
+            .environmentObject(UserInfoViewModel())
     }
 }

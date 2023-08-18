@@ -13,7 +13,7 @@ struct ProductDetailView: View {
     @EnvironmentObject var authentication: Authentication
     @EnvironmentObject var fireStoreViewModel: FireStoreViewModel
     @EnvironmentObject var chatViewModel: ChatViewModel
-    @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var userInfoViewModel: UserInfoViewModel
     @State private var showDeleteAlert: Bool = false
     @Binding var showMessageDetail: Bool
     @Binding var showExistingMessageDetail: Bool
@@ -140,8 +140,9 @@ struct ProductDetailView: View {
             }
         }
         .navigationDestination(isPresented: $showMessageDetail, destination: {
-            MessageDetailView(messagesViewModel: MessagesViewModel(for: nil), chatId: nil, selectedProduct: $selectedProduct, messageTitle: selectedProduct?.PRODUCT_NAME ?? "")
+            MessageDetailView(messagesViewModel: MessagesViewModel(for: nil), selectedProduct: $selectedProduct, messageTitle: selectedProduct?.PRODUCT_NAME ?? "")
                 .environmentObject(chatViewModel)
+                .environmentObject(userInfoViewModel)
         })
         .alert("경고", isPresented: $showDeleteAlert) {
             Button("Delete", role: .destructive) {

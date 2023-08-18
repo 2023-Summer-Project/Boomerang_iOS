@@ -14,6 +14,7 @@ struct SignUpView1: View {
     @State private var showAlert: Bool = false
     @State private var showSignUpView2: Bool = false
     @State private var showEmailNotVerifiedAlert: Bool = false
+    @Binding var showMainView: Bool
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -98,7 +99,7 @@ struct SignUpView1: View {
             }
         }
         .navigationDestination(isPresented: $showSignUpView2, destination: {
-            SignUpView2(userEmail: inputEmail)
+            SignUpView2(userEmail: inputEmail, showMainView: $showMainView)
                 .environmentObject(authentication)
         })
     }
@@ -106,7 +107,7 @@ struct SignUpView1: View {
 
 struct EmailVerifyView_Previews: PreviewProvider {
     static var previews: some View {
-        SignUpView1()
+        SignUpView1(showMainView: .constant(false))
             .environmentObject(Authentication())
             .environmentObject(UserInfoViewModel())
     }

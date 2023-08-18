@@ -11,6 +11,7 @@ struct MainView: View {
     @StateObject var fireStoreViewModel: FireStoreViewModel = FireStoreViewModel()
     @StateObject var chatViewModel: ChatViewModel = ChatViewModel()
     @StateObject var authentication: Authentication = Authentication()
+    @StateObject var userInfoViewModel: UserInfoViewModel = UserInfoViewModel()
     @State private var notificationCount: Int = 1
     @State private var selectedItem: Int = 0
     @State private var previousSelectedItem: Int = 0
@@ -26,6 +27,7 @@ struct MainView: View {
                 .environmentObject(authentication)
                 .environmentObject(fireStoreViewModel)
                 .environmentObject(chatViewModel)
+                .environmentObject(userInfoViewModel)
                 .tabItem {
                     Image(systemName: "house")
                 }
@@ -47,14 +49,16 @@ struct MainView: View {
             
             MessageListView(showMessageDetail: $showMessageDetail, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct)
                 .environmentObject(chatViewModel)
+                .environmentObject(userInfoViewModel)
                 .tabItem {
                     Image(systemName: "paperplane.fill")
                 }
                 .badge(notificationCount)
                 .tag(3)
             
-            SettingView(showMainView: $showMainView)
+            MyPageView(showMainView: $showMainView)
                 .environmentObject(authentication)
+                .environmentObject(userInfoViewModel)
                 .tabItem {
                     Image(systemName: "person.fill")
                 }

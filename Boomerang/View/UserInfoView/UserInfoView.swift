@@ -47,8 +47,9 @@ struct UserInfoView: View {
             .padding([.leading, .bottom, .trailing])
             
         }
+        .foregroundColor(.white)
         .background(.indigo)
-        //.cornerRadius(10)
+        .cornerRadius(10)
     }
 }
 

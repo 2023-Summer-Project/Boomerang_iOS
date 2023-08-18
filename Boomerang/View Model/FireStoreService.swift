@@ -45,7 +45,7 @@ struct FireStoreService {
         .eraseToAnyPublisher()
     }
     
-    static func fetchDocument(for productId: String) -> AnyPublisher<String, Error> {
+    static func getOwnerIdFromProductId(_ productId: String) -> AnyPublisher<String, Error> {
         return Future() { promise in
             db.collection("Product").document(productId).getDocument { (document, error) in
                 if let error = error {

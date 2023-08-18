@@ -11,12 +11,12 @@ import FirebaseAuth
 struct MessageDetailView: View {
     @StateObject var messagesViewModel: MessagesViewModel
     @EnvironmentObject var chatViewModel: ChatViewModel
-    @State var chatId: String?
+    @EnvironmentObject var userInfoViewModel: UserInfoViewModel
     @Binding var selectedProduct: Product?
-    var messageTitle: String
     
+    var messageTitle: String
     var sortedMessages: [Message] {        
-        messagesViewModel.messages[chatId ?? "", default: []]
+        messagesViewModel.messages[messagesViewModel.chatId ?? "", default: []]
             .sorted(by: { $0.timestamp < $1.timestamp })
     }
     
@@ -29,9 +29,9 @@ struct MessageDetailView: View {
                     .underline()
                 Spacer()
             }
-            .font(.caption2)
+            .font(.system(size: 14))
             .background(.gray)
-            .cornerRadius(8)
+            .cornerRadius(10)
             .padding([.leading, .trailing], 10)
             
             ScrollView {
@@ -46,9 +46,10 @@ struct MessageDetailView: View {
                 }
             }
             
-            MessageInputView(selectedProduct: $selectedProduct, chatId: $chatId, chatTitle: messageTitle)
+            MessageInputView(selectedProduct: $selectedProduct, chatTitle: messageTitle)
                 .environmentObject(messagesViewModel)
                 .environmentObject(chatViewModel)
+                .environmentObject(userInfoViewModel)
                 .padding([.leading, .bottom, .trailing])
                 .padding(.top, 3)
         }
@@ -60,7 +61,8 @@ struct MessageDetailView: View {
 
 struct MessageDetailVie_Previews: PreviewProvider {
     static var previews: some View {
-        MessageDetailView(messagesViewModel: MessagesViewModel(for: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023"),chatId: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023", selectedProduct: .constant(nil), messageTitle: "메시지 타이틀")
+        MessageDetailView(messagesViewModel: MessagesViewModel(for: "bad51940-15ec-4ea3-ac2f-9b79bf9aa023"), selectedProduct: .constant(nil), messageTitle: "메시지 타이틀")
             .environmentObject(ChatViewModel())
+            .environmentObject(UserInfoViewModel())
     }
 }

@@ -13,6 +13,7 @@ struct ProductTypeView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Text("종류")
+                .bold()
             TextField("물건의 종류는 무엇인가요?", text: $productType)
                 .textFieldStyle(.roundedBorder)
         }

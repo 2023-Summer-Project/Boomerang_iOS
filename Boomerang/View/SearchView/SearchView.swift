@@ -8,22 +8,22 @@
 import SwiftUI
 
 struct SearchView: View {
-    @EnvironmentObject var fireStoreViewModel: FireStoreViewModel
+    @EnvironmentObject var productViewModel: ProductViewModel
     @EnvironmentObject var authentication: Authentication
     @State private var search: String = ""
     @Binding var selectedItem: Int
-    @Binding var showMessageDetail: Bool
     @Binding var showExistingMessageDetail: Bool
     @Binding var selectedProduct: Product?
     
     var body: some View {
         NavigationView {
             List {
-                ForEach(fireStoreViewModel.filteredProducts, id: \.self) { product in
+                ForEach(productViewModel.filteredProducts) { product in
                     ZStack {
-                        NavigationLink(destination: { ProductDetailView(showMessageDetail: $showMessageDetail, showExistingMessageDetail: $showExistingMessageDetail, selectedItem: $selectedItem, selectedProduct: $selectedProduct, product: product)
+                        NavigationLink(destination: {
+                            ProductDetailView(showExistingMessageDetail: $showExistingMessageDetail, selectedItem: $selectedItem, selectedProduct: $selectedProduct, product: product)
                                 .environmentObject(authentication)
-                                .environmentObject(fireStoreViewModel)
+                                .environmentObject(productViewModel)
                         }, label: {})
                         .opacity(0.0)
                         ProductListRowView(product: product)
@@ -34,7 +34,7 @@ struct SearchView: View {
             .listStyle(.plain)
             .searchable(text: $search)
             .onChange(of: search, perform: {
-                fireStoreViewModel.searchProducts($0)
+                productViewModel.searchProducts($0)
             })
         }
         .navigationViewStyle(.stack)
@@ -43,8 +43,8 @@ struct SearchView: View {
 
 struct SearchView_Previews: PreviewProvider {
     static var previews: some View {
-        SearchView(selectedItem: .constant(2), showMessageDetail: .constant(false), showExistingMessageDetail: .constant(false), selectedProduct: .constant(nil))
+        SearchView(selectedItem: .constant(2), showExistingMessageDetail: .constant(false), selectedProduct: .constant(nil))
             .environmentObject(Authentication())
-            .environmentObject(FireStoreViewModel())
+            .environmentObject(ProductViewModel())
     }
 }

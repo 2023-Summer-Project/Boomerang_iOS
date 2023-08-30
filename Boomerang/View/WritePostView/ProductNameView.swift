@@ -13,9 +13,12 @@ struct ProductNameView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Text("물건 이름")
+                .bold()
+            
             TextField("물건의 이름을 작성해 주세요.", text: $productName)
                 .textFieldStyle(.roundedBorder)
         }
+        .padding(.bottom, 10)
     }
 }
 

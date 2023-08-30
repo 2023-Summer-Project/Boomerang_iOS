@@ -11,11 +11,10 @@ struct PriceView: View {
     @Binding var price: String
     
     var body: some View {
-        VStack {
-            HStack {
-                Text("가격")
-                Spacer()
-            }
+        VStack(alignment: .leading) {
+            Text("가격")
+                .bold()
+            
             HStack {
                 TextField("가격은 얼마 인가요?", text: $price)
                     .textFieldStyle(.roundedBorder)

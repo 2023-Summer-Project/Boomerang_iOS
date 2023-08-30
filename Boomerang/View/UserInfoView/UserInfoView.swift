@@ -35,6 +35,7 @@ struct UserInfoView: View {
                     
                     Text(userInfo?.userEmail ?? "")
                         .font(.body)
+                        .foregroundColor(.gray)
                 }
                 
                 Spacer()

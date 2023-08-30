@@ -8,64 +8,76 @@
 import SwiftUI
 
 struct ProductListView: View {
-    @EnvironmentObject var fireStore: FireStoreViewModel
+    @EnvironmentObject var productViewModel: ProductViewModel
     @EnvironmentObject var authentication: Authentication
     @EnvironmentObject var chatViewModel: ChatViewModel
     @EnvironmentObject var userInfoViewModel: UserInfoViewModel
+    @EnvironmentObject var transactionViewModel: TransactionViewModel
     @Environment(\.colorScheme) private var colorScheme
-    @State private var search: String = ""
     @Binding var selectedItem: Int
-    @Binding var showMessageDetail: Bool
     @Binding var showExistingMessageDetail: Bool
     @Binding var selectedProduct: Product?
     
+    var products: [Product]
+    
     var body: some View {
         List {
-            ForEach(fireStore.products, id: \.self) { product in
+            ForEach(products) { product in
                 ZStack {
-                    NavigationLink(destination: { ProductDetailView(showMessageDetail: $showMessageDetail, showExistingMessageDetail: $showExistingMessageDetail, selectedItem: $selectedItem, selectedProduct: $selectedProduct, product: product)
+                    NavigationLink(destination: {
+                        ProductDetailView(showExistingMessageDetail: $showExistingMessageDetail, selectedItem: $selectedItem, selectedProduct: $selectedProduct, product: product)
                             .environmentObject(authentication)
-                            .environmentObject(fireStore)
+                            .environmentObject(productViewModel)
                             .environmentObject(chatViewModel)
                             .environmentObject(userInfoViewModel)
+                            .environmentObject(transactionViewModel)
                     }, label: {})
                     .opacity(0.0)
                     ProductListRowView(product: product)
-                        .environmentObject(fireStore)
+                        .environmentObject(productViewModel)
                 }
                 .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
+                .alignmentGuide(.listRowSeparatorLeading) { _ in
+                    return 0
+                }
             }
         }
-        .scrollContentBackground(.hidden)
         .listStyle(.plain)
         .safeAreaInset(edge: .top, content: {
-            HStack {
-                Text("둘러보기")
-                    .bold()
-                Spacer()
-                
-                NavigationLink(destination: {
-                    NotificationView()
-                }, label: {
-                    Image(systemName: "bell.fill")
-                })
+            if selectedItem == 0 {
+                VStack {
+                    HStack {
+                        Text("둘러보기")
+                            .padding([.leading, .top])
+                            .bold()
+                        Spacer()
+                        
+                        NavigationLink(destination: {
+                            NotificationView()
+                        }, label: {
+                            Image(systemName: "bell.fill")
+                                .padding([.trailing])
+                        })
+                    }
+                    Divider()
+                        .frame(width: UIScreen.main.bounds.width)
+                }
+                .font(.title2)
+                .background(colorScheme == .light ? .white : .black)
             }
-            .font(.title2)
-            .padding()
-            .background(colorScheme == .light ? .white : .black)
         })
         .refreshable {
             //아래로 당겨서 refresh
-            fireStore.fetchProduct()
+            productViewModel.getProduct()
         }
     }
 }
 
 struct ProductListView_Previews: PreviewProvider {
     static var previews: some View {
-        ProductListView(selectedItem: .constant(1), showMessageDetail: .constant(false), showExistingMessageDetail: .constant(false), selectedProduct: .constant(nil))
+        ProductListView(selectedItem: .constant(1), showExistingMessageDetail: .constant(false), selectedProduct: .constant(nil), products: [])
             .environmentObject(Authentication())
-            .environmentObject(FireStoreViewModel())
+            .environmentObject(ProductViewModel())
             .environmentObject(ChatViewModel())
             .environmentObject(UserInfoViewModel())
     }

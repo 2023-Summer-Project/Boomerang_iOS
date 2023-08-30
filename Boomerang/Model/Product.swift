@@ -9,7 +9,7 @@ import Foundation
 import FirebaseFirestoreSwift
 import FirebaseFirestore
 
-struct Product: Codable, Hashable {
+struct Product: Identifiable {
     var id: String
     var IMAGES_MAP: Dictionary<String, String>
     var IMAGE_MAP_KEYS: [String]
@@ -20,15 +20,16 @@ struct Product: Codable, Hashable {
     var POST_TITLE: String
     var PRICE: Double
     var PRODUCT_NAME: String
-    var PRODUCT_TYPE: String
     var TIMESTAMP: Timestamp
+    var OWNER_NAME: String
+    var PROFILE_IMAGE: String
+    var LONGITUDE: Double
+    var LATITUDE: Double
+    var AVAILABLE_TIME: [String]
     var dateString: String {
-        let dateFormatter: DateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        return dateFormatter.string(from: TIMESTAMP.dateValue())
+        TIMESTAMP.dateValue().getDayAndTimeFormat()
     }
     var dateDiff: Int {
-        return Int(Date().timeIntervalSince(TIMESTAMP.dateValue()))
+        Int(Date().timeIntervalSince(TIMESTAMP.dateValue()))
     }
 }

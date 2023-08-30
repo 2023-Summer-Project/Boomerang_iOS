@@ -8,10 +8,16 @@
 import SwiftUI
 
 struct MyPageView: View {
+    @EnvironmentObject var productViewModel: ProductViewModel
     @EnvironmentObject var userInfoViewModel: UserInfoViewModel
     @EnvironmentObject var authentication: Authentication
+    @EnvironmentObject var chatViewModel: ChatViewModel
+    @EnvironmentObject var transactionViewModel: TransactionViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Binding var showMainView: Bool
+    @Binding var selectedItem: Int
+    @Binding var showExistingMessageDetail: Bool
+    @Binding var selectedProduct: Product?
     
     var body: some View {
         List {
@@ -20,14 +26,16 @@ struct MyPageView: View {
             
             Section(header: Text("내 거래"), content: {
                 NavigationLink(destination: {
-                    TransectionListView()
+                    ProgressingTransactionView()
+                        .environmentObject(transactionViewModel)
                 }, label: {
                     Text("진행 중인 거래")
                         .padding([.top, .bottom], 10)
                 })
                 
                 NavigationLink(destination: {
-                    EndedTransectionListView()
+                    CompletionTransectionListView(transactions: transactionViewModel.completionTransactions)
+                        .environmentObject(transactionViewModel)
                 }, label: {
                     Text("완료한 거래")
                         .padding([.top, .bottom], 10)
@@ -36,7 +44,12 @@ struct MyPageView: View {
             
             Section(header: Text("내 물건"), content: {
                 NavigationLink(destination: {
-                    MyProductListView()
+                    ProductListView(selectedItem: $selectedItem, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct, products: productViewModel.userProducts)
+                        .environmentObject(authentication)
+                        .environmentObject(productViewModel)
+                        .environmentObject(chatViewModel)
+                        .environmentObject(userInfoViewModel)
+                        .environmentObject(transactionViewModel)
                 }, label: {
                     Text("내가 등록한 물건")
                         .padding([.top, .bottom], 10)
@@ -56,19 +69,24 @@ struct MyPageView: View {
         }
         .listStyle(.plain)
         .safeAreaInset(edge: .top) {
-            HStack {
-                Text("내 정보")
-                    .bold()
+            VStack {
+                HStack {
+                    Text("내 정보")
+                    
+                    Spacer()
+                    
+                    NavigationLink(destination: {
+                        SettingView()
+                    }, label: {
+                        Image(systemName: "gearshape.fill")
+                    })
+                }
                 
-                Spacer()
-                
-                NavigationLink(destination: {
-                    SettingView()
-                }, label: {
-                    Image(systemName: "gearshape.fill")
-                })
+                Divider()
+                    .frame(width: UIScreen.main.bounds.width)
             }
-            .padding()
+            .padding([.leading, .top, .trailing])
+            .bold()
             .font(.title2)
             .background(colorScheme == .light ? .white : .black)
         }
@@ -77,8 +95,11 @@ struct MyPageView: View {
 
 struct MyPageView_Previews: PreviewProvider {
     static var previews: some View {
-        MyPageView(showMainView: .constant(true))
+        MyPageView(showMainView: .constant(true), selectedItem: .constant(1), showExistingMessageDetail: .constant(false), selectedProduct: .constant(nil))
+            .environmentObject(ChatViewModel())
+            .environmentObject(ProductViewModel())
             .environmentObject(Authentication())
             .environmentObject(UserInfoViewModel())
+            .environmentObject(TransactionViewModel())
     }
 }

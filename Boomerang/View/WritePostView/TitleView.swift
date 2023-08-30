@@ -11,11 +11,10 @@ struct TitleView: View {
     @Binding var title: String
     
     var body: some View {
-        VStack {
-            HStack {
-                Text("제목")
-                Spacer()
-            }
+        VStack(alignment: .leading) {
+            Text("제목")
+                .bold()
+            
             TextField("제목을 입력해 주세요.", text: $title)
                 .textFieldStyle(.roundedBorder)
         }

@@ -11,11 +11,9 @@ struct ContentView: View {
     @Binding var content: String
     
     var body: some View {
-        VStack {
-            HStack {
-                Text("물건 소개")
-                Spacer()
-            }
+        VStack(alignment: .leading) {
+            Text("물건 소개")
+                .bold()
             
             TextField("물건에 대한 소개를 작성해 주세요.", text: $content, axis: .vertical)
                 .textFieldStyle(.roundedBorder)

@@ -92,9 +92,9 @@ extension ChatViewModel {
     }
 }
 
-func getChatIdOfSelectedProduct(_ productId: String?) -> String? {
-    if case .some(let value) = productId {
-        return Auth.auth().currentUser!.uid + "_" + value
+func getChatIdFromSelectedProduct(_ product: Product?) -> String? {
+    if case .some(let value) = product {
+        return Auth.auth().currentUser!.uid + "_" + value.OWNER_ID + "_" + value.id
     }
 
     return nil

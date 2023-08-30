@@ -35,5 +35,15 @@ final class UserInfoViewModel: ObservableObject {
     
     func uploadUserInfo(_ email: String, _ userName: String) {
         UserInfoService.uploadUserInfo(email: email, userName: userName)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    print("successfully uploaded User Info")
+                case .failure(let error):
+                    print("Error: ", error)
+                }}, receiveValue: {
+                    print("upload User Info")
+                })
+            .store(in: &self.cancellables)
     }
 }

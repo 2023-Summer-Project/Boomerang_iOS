@@ -48,23 +48,3 @@ struct ImagePickerView: UIViewControllerRepresentable {
         return Coordinator(self)
     }
 }
-
-//extension UIImage {
-//    func crop() -> UIImage {
-//        guard let cgImage = self.cgImage else {
-//            return self
-//        }
-//
-//        let sourceSize = self.size
-//        let sideLength = min(sourceSize.width, sourceSize.height)
-//        let xOffset = (sourceSize.width - 2100) / 2.0
-//        let yOffset = (sourceSize.height - 2100) / 2.0
-//        let cropRect = CGRect(x: xOffset, y: yOffset, width: 2100, height: 2100)
-//
-//        guard let croppedCgImage = cgImage.cropping(to: cropRect) else {
-//            return self
-//        }
-//
-//        return UIImage(cgImage: croppedCgImage, scale: self.scale, orientation: self.imageOrientation)
-//    }
-//}

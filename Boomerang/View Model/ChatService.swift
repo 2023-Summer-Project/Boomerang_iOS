@@ -17,7 +17,7 @@ struct ChatService {
     
     static func fetchChatList() -> AnyPublisher<String?, Never> {
         let subject = CurrentValueSubject<String?, Never>(nil)
-        let handle = ref.child("user").child(Auth.auth().currentUser?.uid ?? "").child("chat_list").observe(.childAdded, with: { snapshot in
+        let handle = ref.child("user").child(Auth.auth().currentUser?.uid ?? "c0rIGlsb3JPmD2xMZMixWK7holT2").child("chat_list").observe(.childAdded, with: { snapshot in
             subject.send(snapshot.key)
         })
         

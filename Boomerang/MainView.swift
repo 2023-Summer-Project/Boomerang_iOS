@@ -8,34 +8,35 @@
 import SwiftUI
 
 struct MainView: View {
-    @StateObject var fireStoreViewModel: FireStoreViewModel = FireStoreViewModel()
+    @StateObject var productViewModel: ProductViewModel = ProductViewModel()
     @StateObject var chatViewModel: ChatViewModel = ChatViewModel()
     @StateObject var authentication: Authentication = Authentication()
     @StateObject var userInfoViewModel: UserInfoViewModel = UserInfoViewModel()
+    @StateObject var transactionViewModel: TransactionViewModel = TransactionViewModel()
     @State private var notificationCount: Int = 1
     @State private var selectedItem: Int = 0
     @State private var previousSelectedItem: Int = 0
     @State private var showWritePost: Bool = false
-    @State private var showMessageDetail: Bool = false
     @State private var showExistingMessageDetail: Bool = false
     @State private var selectedProduct: Product?
     @Binding var showMainView: Bool
     
     var body: some View {
         TabView(selection: $selectedItem) {
-            ProductListView(selectedItem: $selectedItem, showMessageDetail: $showMessageDetail, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct)
+            ProductListView(selectedItem: $selectedItem, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct, products: productViewModel.products)
                 .environmentObject(authentication)
-                .environmentObject(fireStoreViewModel)
+                .environmentObject(productViewModel)
                 .environmentObject(chatViewModel)
                 .environmentObject(userInfoViewModel)
+                .environmentObject(transactionViewModel)
                 .tabItem {
                     Image(systemName: "house")
                 }
                 .tag(0)
             
-            SearchView(selectedItem: $selectedItem, showMessageDetail: $showMessageDetail, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct)
+            SearchView(selectedItem: $selectedItem, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct)
                 .environmentObject(authentication)
-                .environmentObject(fireStoreViewModel)
+                .environmentObject(productViewModel)
                 .tabItem {
                     Image(systemName: "magnifyingglass")
                 }
@@ -47,7 +48,7 @@ struct MainView: View {
                 }
                 .tag(2)
             
-            MessageListView(showMessageDetail: $showMessageDetail, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct)
+            MessageListView(selectedProduct: $selectedProduct)
                 .environmentObject(chatViewModel)
                 .environmentObject(userInfoViewModel)
                 .tabItem {
@@ -56,9 +57,12 @@ struct MainView: View {
                 .badge(notificationCount)
                 .tag(3)
             
-            MyPageView(showMainView: $showMainView)
+            MyPageView(showMainView: $showMainView, selectedItem: $selectedItem, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct)
+                .environmentObject(chatViewModel)
+                .environmentObject(productViewModel)
                 .environmentObject(authentication)
                 .environmentObject(userInfoViewModel)
+                .environmentObject(transactionViewModel)
                 .tabItem {
                     Image(systemName: "person.fill")
                 }
@@ -72,10 +76,13 @@ struct MainView: View {
                 previousSelectedItem = value
             }
         }
-        .sheet(isPresented: $showWritePost, content: {
-            WritePostView(showWritePost: $showWritePost)
-                .environmentObject(authentication)
-                .environmentObject(fireStoreViewModel)
+        .fullScreenCover(isPresented: $showWritePost, content: {
+            NavigationStack {
+                WritePostView(showWritePost: $showWritePost)
+                    .environmentObject(authentication)
+                    .environmentObject(productViewModel)
+                    .environmentObject(userInfoViewModel)
+            }
         })
         .onAppear {
             let tabBarAppearance = UITabBarAppearance()
@@ -83,6 +90,11 @@ struct MainView: View {
             UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
         }
         .navigationBarBackButtonHidden(true)
+        .navigationDestination(isPresented: $showExistingMessageDetail, destination: {
+            MessageDetailView(messagesViewModel: MessagesViewModel(for: getChatIdFromSelectedProduct(selectedProduct)), selectedProduct: $selectedProduct, messageTitle: selectedProduct?.PRODUCT_NAME ?? "")
+                .environmentObject(chatViewModel)
+                .environmentObject(userInfoViewModel)
+        })
     }
 }
 

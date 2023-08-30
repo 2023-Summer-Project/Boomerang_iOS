@@ -11,8 +11,6 @@ struct MessageListView: View {
     @EnvironmentObject var chatViewModel: ChatViewModel
     @EnvironmentObject var userInfoViewModel: UserInfoViewModel
     @Environment(\.colorScheme) private var colorScheme
-    @Binding var showMessageDetail: Bool
-    @Binding var showExistingMessageDetail: Bool
     @Binding var selectedProduct: Product?
     
     var sortedChatList: [Chat] {
@@ -37,27 +35,27 @@ struct MessageListView: View {
         .listStyle(.plain)
         .navigationTitle("채팅")
         .safeAreaInset(edge: .top) {
-            HStack {
-                Text("채팅")
-                    .font(.title2)
-                    .bold()
-                    .padding()
+            VStack {
+                HStack {
+                    Text("채팅")
+                    
+                    Spacer()
+                }
                 
-                Spacer()
+                Divider()
+                    .frame(width: UIScreen.main.bounds.width)
             }
+            .font(.title2)
+            .bold()
+            .padding([.leading, .top, .trailing])
             .background(colorScheme == .light ? .white : .black)
         }
-        .navigationDestination(isPresented: $showExistingMessageDetail, destination: {
-            MessageDetailView(messagesViewModel: MessagesViewModel(for: getChatIdOfSelectedProduct(selectedProduct?.id)), selectedProduct: $selectedProduct, messageTitle: selectedProduct?.PRODUCT_NAME ?? "제목")
-                .environmentObject(chatViewModel)
-                .environmentObject(userInfoViewModel)
-        })
     }
 }
 
 struct MessageListView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageListView(showMessageDetail: .constant(false), showExistingMessageDetail: .constant(false), selectedProduct: .constant(nil))
+        MessageListView(selectedProduct: .constant(nil))
             .environmentObject(ChatViewModel())
             .environmentObject(UserInfoViewModel())
     }

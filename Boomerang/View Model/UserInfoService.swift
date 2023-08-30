@@ -15,7 +15,7 @@ struct UserInfoService {
     static private let db = Firestore.firestore()
     
     static func fetchUserInfo() -> AnyPublisher<UserInfo?, Error> {
-        let userId = Auth.auth().currentUser!.uid
+        let userId = Auth.auth().currentUser?.uid ?? "c0rIGlsb3JPmD2xMZMixWK7holT2"
         
         return Future() { promise in
             db.collection("User").document(userId).getDocument { (document, error) in

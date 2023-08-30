@@ -19,13 +19,25 @@ struct SignInView: View {
     
     var body: some View {
         ZStack {
-//            LinearGradient(gradient: Gradient(colors: [.white, .indigo]), startPoint: .topLeading, endPoint: .bottomTrailing)
-//            .edgesIgnoringSafeArea(.all)
+            Text("반갑습니다!")
+                .bold()
+                .foregroundColor(.white)
+                .font(.title)
+                .frame(maxWidth: .infinity, maxHeight: UIScreen.main.bounds.height / 3)
+                .background(Color.indigo)
+                .clipShape(
+                    .rect(
+                        topLeadingRadius: 0,
+                        bottomLeadingRadius: 50,
+                        bottomTrailingRadius: 50,
+                        topTrailingRadius: 0
+                    )
+                )
+                .offset(y: -(UIScreen.main.bounds.height / 2.8))
+                .shadow(color: .gray, radius: 10, x: 0, y: 7)
+            
             
             VStack {
-                Text("환영합니다!")
-                    .font(.largeTitle)
-                
                 TextField("이메일", text: $inputEmail)
                     .textFieldStyle(.roundedBorder)
                     .padding(.bottom, 10)
@@ -49,7 +61,7 @@ struct SignInView: View {
                             .foregroundColor(.white)
                             .padding()
                     }
-                    .frame(width: UIScreen.main.bounds.width - 30)
+                    .frame(maxWidth: .infinity)
                     .background(Color.indigo)
                     .cornerRadius(10)
                 })

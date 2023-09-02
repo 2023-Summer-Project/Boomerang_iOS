@@ -12,10 +12,10 @@ struct OtherUserMessageView: View {
     
     var body: some View {
         HStack(alignment: .bottom) {
-            Image(systemName: "person.circle.fill")
-                .resizable()
-                .frame(width: 45, height: 45)
-                .foregroundColor(.gray)
+//            Image(systemName: "person.circle.fill")
+//                .resizable()
+//                .frame(width: 45, height: 45)
+//                .foregroundColor(.gray)
             
             VStack(alignment: .leading) {
                 Text(message.user_name)

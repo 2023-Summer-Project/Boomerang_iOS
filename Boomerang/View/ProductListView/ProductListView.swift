@@ -68,8 +68,13 @@ struct ProductListView: View {
         })
         .refreshable {
             //아래로 당겨서 refresh
-            productViewModel.getProduct()
+            if selectedItem == 0 {
+                productViewModel.getProduct()
+            } else if selectedItem == 4 {
+                productViewModel.getUserProduct()
+            }
         }
+        .navigationTitle("내가 등록한 물건")
     }
 }
 

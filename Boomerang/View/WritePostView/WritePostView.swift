@@ -136,6 +136,9 @@ struct WritePostView: View {
                 }
             }
         })
+        .onTapGesture {
+            self.endTextEditing()
+        }
     }
 }
 

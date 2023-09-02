@@ -13,7 +13,7 @@ struct MainView: View {
     @StateObject var authentication: Authentication = Authentication()
     @StateObject var userInfoViewModel: UserInfoViewModel = UserInfoViewModel()
     @StateObject var transactionViewModel: TransactionViewModel = TransactionViewModel()
-    @State private var notificationCount: Int = 1
+    @State private var notificationCount: Int = 0
     @State private var selectedItem: Int = 0
     @State private var previousSelectedItem: Int = 0
     @State private var showWritePost: Bool = false
@@ -37,6 +37,9 @@ struct MainView: View {
             SearchView(selectedItem: $selectedItem, showExistingMessageDetail: $showExistingMessageDetail, selectedProduct: $selectedProduct)
                 .environmentObject(authentication)
                 .environmentObject(productViewModel)
+                .environmentObject(chatViewModel)
+                .environmentObject(userInfoViewModel)
+                .environmentObject(transactionViewModel)
                 .tabItem {
                     Image(systemName: "magnifyingglass")
                 }

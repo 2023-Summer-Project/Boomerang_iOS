@@ -34,15 +34,25 @@ struct MessageDetailView: View {
             .cornerRadius(10)
             .padding([.leading, .trailing], 10)
             
-            ScrollView {
-                ForEach(sortedMessages, id: \.timestamp) { message in
-                    if message.user_uid == Auth.auth().currentUser?.uid {
-                        UserMessageView(message: message)
-                            .padding(.trailing, 10)
-                    } else {
-                        OtherUserMessageView(message: message)
-                            .padding(.leading, 10)
+            ScrollViewReader { value in
+                ScrollView {
+                    ForEach(sortedMessages, id: \.timestamp) { message in
+                        if message.user_uid == Auth.auth().currentUser?.uid {
+                            UserMessageView(message: message)
+                                .padding(.trailing, 10)
+                                .id(message.timestamp)
+                        } else {
+                            OtherUserMessageView(message: message)
+                                .padding(.leading, 10)
+                                .id(message.timestamp)
+                        }
                     }
+                }
+                .onTapGesture {
+                    self.endTextEditing()
+                }
+                .onChange(of: sortedMessages.count) { _ in
+                    value.scrollTo(sortedMessages.last?.timestamp)
                 }
             }
             

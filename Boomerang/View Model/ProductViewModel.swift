@@ -1,5 +1,5 @@
 //
-//  FireStore.swift
+//  ProductViewModel.swift
 //  Boomerang
 //
 //  Created by 이정훈 on 2023/07/19.
@@ -31,11 +31,11 @@ extension ProductViewModel {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    print("Documents fetch completed.")
+                    print("successfully fetched Products")
                     DirectoryManager.deleteTmpDirectory()
                     print("Temp Directory has been deleted")
                 case .failure(let error):
-                    print("Error fetching documents: ", error)
+                    print("Error: ", error)
                 }
             }, receiveValue: { products in
                 self.products = products
@@ -80,7 +80,7 @@ extension ProductViewModel {
                         .sink(receiveCompletion: { completion in
                             switch completion {
                             case .finished:
-                                print("download URL finished")
+                                print("successfully downloaded URL")
                             case .failure(let error):
                                 print("download URL failed: ", error)
                             }
@@ -98,19 +98,34 @@ extension ProductViewModel {
                                             print("Error: ", error)
                                         }
                                     }, receiveValue: { LOCATION in
-                                        let product: [String: Any] = ["IMAGES_MAP": images_map, "AVAILABILITY": true, "LOCATION": LOCATION, "PRODUCT_NAME": PRODUCT_NAME, "POST_CONTENT": POST_CONTENT, "POST_TITLE": POST_TITLE, "PRICE": PRICE, "OWNER_ID": OWNER_ID, "TIMESTAMP": Date(), "LONGITUDE": location.longitude, "LATITUDE": location.latitude, "AVAILABLE_TIME": [AVAILABLE_TIME[0].getTimeFormat(), AVAILABLE_TIME[1].getTimeFormat()], "OWNER_NAME": OWNER_NAME, "PROFILE_IMAGE": PROFILE_IMAGE]
+                                        let product: [String: Any] = [
+                                            "IMAGES_MAP": images_map,
+                                            "AVAILABILITY": true,
+                                            "LOCATION": LOCATION,
+                                            "PRODUCT_NAME": PRODUCT_NAME,
+                                            "POST_CONTENT": POST_CONTENT,
+                                            "POST_TITLE": POST_TITLE,
+                                            "PRICE": PRICE,
+                                            "OWNER_ID": OWNER_ID,
+                                            "TIMESTAMP": Date(),
+                                            "LONGITUDE": location.longitude,
+                                            "LATITUDE": location.latitude,
+                                            "AVAILABLE_TIME": [AVAILABLE_TIME[0].getTimeFormat(), AVAILABLE_TIME[1].getTimeFormat()],
+                                            "OWNER_NAME": OWNER_NAME,
+                                            "PROFILE_IMAGE": PROFILE_IMAGE
+                                        ]
                                         
                                         FireStoreService.uploadProduct(newProduct: product)
                                             .sink(receiveCompletion: { completion in
                                                 switch completion {
                                                 case .finished:
-                                                    print("write Document finished")
+                                                    print("successfully wrote Document")
                                                 case .failure(let error):
                                                     print("write document failed: ", error)
                                                 }
-                                            }, receiveValue: {
-                                                print("Document is successfully written!")
-                                                self.getProduct()
+                                            }, receiveValue: { [weak self] in
+                                                print("write new Document")
+                                                self?.getProduct()
                                             })
                                             .store(in: &self.cancellables)
                                     })
@@ -119,7 +134,7 @@ extension ProductViewModel {
                         })
                         .store(in: &self.cancellables)
                 })
-                .store(in: &self.cancellables)
+                .store(in: &cancellables)
         }
     }
     
@@ -144,7 +159,7 @@ extension ProductViewModel {
                     case .finished:
                         print("delete Image finished")
                     case .failure(let error):
-                        print("delete Image failed: ", error)
+                        print("Error: ", error)
                     }
                 }, receiveValue: {
                     print("Image is successfully deleted!")
@@ -157,7 +172,7 @@ extension ProductViewModel {
 //MARK: - search data
 extension ProductViewModel {
     func searchProducts(_ target: String) {
-        filteredProducts = FireStoreService.filterProducts(target: target, products: products)
+        filteredProducts = FireStoreService.fetchFilteredProducts(products, target: target)
     }
 }
 

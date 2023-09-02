@@ -41,7 +41,7 @@ struct TransactionListRowView: View {
                 AsyncImage(url: URL(string: transaction.PRODUCT_IMAGE)) { image in
                     image
                         .resizable()
-                        .frame(width: 70.0, height: 70.0)
+                        .frame(width: UIScreen.main.bounds.width * 0.18, height: UIScreen.main.bounds.width * 0.18)
                         .cornerRadius(15)
                 } placeholder: {
                     ZStack {
@@ -49,16 +49,21 @@ struct TransactionListRowView: View {
                             .fill(Color(red: 209 / 255, green: 209 / 255, blue: 209 / 255))
                         ProgressView()
                     }
-                    .frame(width: 70.0, height: 70.0)
+                    .frame(width: UIScreen.main.bounds.width * 0.18, height: UIScreen.main.bounds.width * 0.18)
                     .cornerRadius(15)
                 }
                 
                 VStack(alignment: .leading) {
                     Text(transaction.PRODUCT_NAME)
-                        .font(.title3)
+                        .font(.headline)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.1)
                     
                     Text("\(transaction.START_DATE.dateValue().getDayFormat())부터  \(transaction.END_DATE.dateValue().getDayFormat())까지")
-                        .font(.system(size: 13))
+                        .font(.subheadline)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.1)
+                        .foregroundColor(.gray)
                 }
                 
                 Spacer()
@@ -70,6 +75,7 @@ struct TransactionListRowView: View {
                         showDenyAlert = true
                     }, label: {
                         Text("요청 거절")
+                            .font(.callout)
                             .padding(6)
                             .frame(maxWidth: .infinity)
                             .foregroundColor(.white)
@@ -87,6 +93,7 @@ struct TransactionListRowView: View {
                         showAcceptionAlert = true
                     }, label: {
                         Text("요청 수락")
+                            .font(.callout)
                             .padding(6)
                             .frame(maxWidth: .infinity)
                             .foregroundColor(.white)
@@ -100,11 +107,22 @@ struct TransactionListRowView: View {
                         }))
                     }
                 }
+            } else if transaction.RENTEE == Auth.auth().currentUser?.uid && transaction.STATUS == .accepted {
+                Text("요청이 수락 되었습니다.")
+                    .font(.callout)
+                    .foregroundColor(.gray)
+                    .frame(maxWidth: .infinity)
+                    .padding(6)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.gray, lineWidth: 2)
+                    )
             } else if transaction.STATUS == .rejected || transaction.STATUS == .accepted {
                 Button(action: {
                     showCompletionAlert = true
                 }, label: {
                     Text("거래 완료")
+                        .font(.callout)
                         .padding(6)
                         .frame(maxWidth: .infinity)
                         .foregroundColor(.white)
@@ -119,15 +137,7 @@ struct TransactionListRowView: View {
                 }
             } else if transaction.STATUS == .required {
                 Text("요청을 기다리는 중이에요")
-                    .foregroundColor(.gray)
-                    .frame(maxWidth: .infinity)
-                    .padding(6)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray, lineWidth: 2)
-                    )
-            } else if transaction.RENTEE == Auth.auth().currentUser?.uid && transaction.STATUS == .accepted {
-                Text("요청이 수락 되었습니다.")
+                    .font(.callout)
                     .foregroundColor(.gray)
                     .frame(maxWidth: .infinity)
                     .padding(6)
@@ -137,6 +147,7 @@ struct TransactionListRowView: View {
                     )
             } else if transaction.STATUS == .completed {
                 Text("거래가 종료 되었습니다.")
+                    .font(.callout)
                     .foregroundColor(.gray)
                     .frame(maxWidth: .infinity)
                     .padding(6)
@@ -146,7 +157,7 @@ struct TransactionListRowView: View {
                     )
             }
         }
-        .padding()
+        .padding(10)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray, lineWidth: 1)

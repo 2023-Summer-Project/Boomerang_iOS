@@ -25,11 +25,11 @@ final class TransactionViewModel: ObservableObject {
     init() {
         getSentTransaction()
         getRequestedTransaction()
-        getCompletionTransaction()
+        getCompletedTransaction()
     }
     
     func getSentTransaction() {
-        FireStoreService.fetchTransaction(role: "RENTEE", status: "REQUESTED", "ACCEPTED", "REJECTED")
+        FireStoreService.fetchRequestedTransaction(role: "RENTEE", status: "REQUESTED", "ACCEPTED", "REJECTED")
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -44,7 +44,7 @@ final class TransactionViewModel: ObservableObject {
     }
     
     func getRequestedTransaction() {
-        FireStoreService.fetchTransaction(role: "RENTER", status: "REQUESTED", "ACCEPTED", "REJECTED")
+        FireStoreService.fetchRequestedTransaction(role: "RENTER", status: "REQUESTED", "ACCEPTED", "REJECTED")
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
@@ -58,8 +58,8 @@ final class TransactionViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func getCompletionTransaction() {
-        FireStoreService.fetchTransaction(status: "COMPLETED")
+    func getCompletedTransaction() {
+        FireStoreService.fetchCompletedTransaction(status: "COMPLETED")
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:

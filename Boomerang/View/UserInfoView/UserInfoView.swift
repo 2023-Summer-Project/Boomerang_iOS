@@ -42,10 +42,10 @@ struct UserInfoView: View {
             }
             .padding([.leading, .top, .bottom])
             
-            Button(action: {}, label: {
-                Text("회원정보 수정")
-            })
-            .padding([.leading, .bottom, .trailing])
+//            Button(action: {}, label: {
+//                Text("회원정보 수정")
+//            })
+//            .padding([.leading, .bottom, .trailing])
             
         }
         .foregroundColor(.white)

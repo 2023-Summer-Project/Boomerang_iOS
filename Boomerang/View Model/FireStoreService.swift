@@ -19,7 +19,7 @@ struct FireStoreService {
 
 //MARK: - Product
 extension FireStoreService {
-    static func filterProducts(target: String, products: [Product]) -> [Product] {
+    static func fetchFilteredProducts(_ products: [Product], target: String) -> [Product] {
         let result = products.filter {
             return $0.POST_TITLE.contains(target) || $0.POST_CONTENT.contains(target)
         }
@@ -29,21 +29,15 @@ extension FireStoreService {
     
     static func fetchProducts() -> AnyPublisher<[Product], Error> {
         return Future() { promise in
-            db.collection("Product").order(by: "TIMESTAMP", descending: true).getDocuments(source: FirestoreSource.server) { (querySnapshot, error) in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    let products = querySnapshot?.documents.map { document in
-                        let data = document.data()
-                        let images_map: Dictionary<String, String> = data["IMAGES_MAP"] as! Dictionary<String, String>
-                        let image_map_keys: Array<String> = images_map.keys.sorted(by: {$0 < $1})
-                        
-                        return Product(id: document.documentID, IMAGES_MAP: images_map, IMAGE_MAP_KEYS: image_map_keys, AVAILABILITY: (data["AVAILABILITY"] != nil), LOCATION: data["LOCATION"] as! String, OWNER_ID: data["OWNER_ID"] as! String, POST_CONTENT: data["POST_CONTENT"] as! String, POST_TITLE: data["POST_TITLE"] as! String, PRICE: data["PRICE"] as! Double, PRODUCT_NAME: data["PRODUCT_NAME"] as! String, TIMESTAMP: data["TIMESTAMP"] as! Timestamp, OWNER_NAME: data["OWNER_NAME"] as! String, PROFILE_IMAGE: data["PROFILE_IMAGE"] as! String, LONGITUDE: data["LONGITUDE"] as! Double, LATITUDE: data["LATITUDE"] as! Double, AVAILABLE_TIME: data["AVAILABLE_TIME"] as! [String])
+            db.collection("Product")
+                .order(by: "TIMESTAMP", descending: true)
+                .getDocuments(source: FirestoreSource.server) { (querySnapshot, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(getProductArray(querySnapshot)!))
                     }
-                    
-                    promise(.success(products!))
                 }
-            }
         }
         .eraseToAnyPublisher()
     }
@@ -58,15 +52,7 @@ extension FireStoreService {
                         if let error = error {
                             promise(.failure(error))
                         } else {
-                            let products = querySnapshot?.documents.map { document in
-                                let data = document.data()
-                                let images_map: Dictionary<String, String> = data["IMAGES_MAP"] as! Dictionary<String, String>
-                                let image_map_keys: Array<String> = images_map.keys.sorted(by: {$0 < $1})
-                                
-                                return Product(id: document.documentID, IMAGES_MAP: images_map, IMAGE_MAP_KEYS: image_map_keys, AVAILABILITY: (data["AVAILABILITY"] != nil), LOCATION: data["LOCATION"] as! String, OWNER_ID: data["OWNER_ID"] as! String, POST_CONTENT: data["POST_CONTENT"] as! String, POST_TITLE: data["POST_TITLE"] as! String, PRICE: data["PRICE"] as! Double, PRODUCT_NAME: data["PRODUCT_NAME"] as! String, TIMESTAMP: data["TIMESTAMP"] as! Timestamp, OWNER_NAME: data["OWNER_NAME"] as! String, PROFILE_IMAGE: data["PROFILE_IMAGE"] as! String, LONGITUDE: data["LONGITUDE"] as! Double, LATITUDE: data["LATITUDE"] as! Double, AVAILABLE_TIME: data["AVAILABLE_TIME"] as! [String])
-                            }
-                            
-                            promise(.success(products!))
+                            promise(.success(getProductArray(querySnapshot)!))
                         }
                     }
             }
@@ -150,59 +136,50 @@ extension FireStoreService {
 
 //MARK: - Transaction
 extension FireStoreService {
-    static func fetchTransaction(role: String? = nil, status: String...) -> AnyPublisher<[Transaction]?, Error> {
+    static func fetchRequestedTransaction(role: String, status: String...) -> AnyPublisher<[Transaction]?, Error> {
         let subject = CurrentValueSubject<[Transaction]?, Error>(nil)
-        let handle = db.collection("Transaction")
-        
-        if let role = role {
-            if let userId = Auth.auth().currentUser?.uid {
-                handle
-                    .whereField(role, isEqualTo: userId)
-                    .whereFilter(Filter.orFilter(
-                        status.map {
-                            Filter.whereField("STATUS", isEqualTo: $0)
-                        }
-                    ))
-                    .addSnapshotListener { (querySnapshot, error) in
-                        guard (querySnapshot?.documents) != nil else {
-                            subject.send(completion: .failure(error!))
-                            return
-                        }
-                        
-                        let transactions = querySnapshot?.documents.map { document in
-                            let data = document.data()
-                            
-                            return Transaction(id: document.documentID, DEPOSIT: data["DEPOSIT"] as! Int, END_DATE: data["END_DATE"] as! Timestamp, LOCATION: data["LOCATION"] as! String, PRICE: data["PRICE"] as! Int, PRODUCT_ID: data["PRODUCT_ID"] as! String, PRODUCT_NAME: data["PRODUCT_NAME"] as! String, RENTEE: data["RENTEE"] as! String, RENTER: data["RENTER"] as! String, START_DATE: data["START_DATE"] as! Timestamp, STATUS: TransactionStatus(rawValue: data["STATUS"] as! String)!, PRODUCT_IMAGE: data["PRODUCT_IMAGE"] as! String)
-                        }
-                        
-                        subject.send(transactions)
-                    }
-            }
-        } else {
-            handle
-                .whereFilter(Filter.orFilter(
-                    status.map {
-                        Filter.whereField("STATUS", isEqualTo: $0)
-                    }
-                ))
-                .addSnapshotListener { (querySnapshot, error) in
-                    guard (querySnapshot?.documents) != nil else {
-                        subject.send(completion: .failure(error!))
-                        return
-                    }
-                    
-                    let transactions = querySnapshot?.documents.map { document in
-                        let data = document.data()
-                        
-                        return Transaction(id: document.documentID, DEPOSIT: data["DEPOSIT"] as! Int, END_DATE: data["END_DATE"] as! Timestamp, LOCATION: data["LOCATION"] as! String, PRICE: data["PRICE"] as! Int, PRODUCT_ID: data["PRODUCT_ID"] as! String, PRODUCT_NAME: data["PRODUCT_NAME"] as! String, RENTEE: data["RENTEE"] as! String, RENTER: data["RENTER"] as! String, START_DATE: data["START_DATE"] as! Timestamp, STATUS: TransactionStatus(rawValue: data["STATUS"] as! String)!, PRODUCT_IMAGE: data["PRODUCT_IMAGE"] as! String)
-                    }
-                    
-                    subject.send(transactions)
+        let listener = db.collection("Transaction")
+            .whereField(role, isEqualTo: Auth.auth().currentUser!.uid)
+            .whereFilter(Filter.orFilter(
+                status.map {
+                    Filter.whereField("STATUS", isEqualTo: $0)
                 }
-        }
+            ))
+            .addSnapshotListener { (querySnapshot, error) in
+                guard (querySnapshot?.documents) != nil else {
+                    subject.send(completion: .failure(error!))
+                    return
+                }
+                
+                subject.send(getTransactionArray(querySnapshot))
+            }
         
         return subject.handleEvents(receiveCancel: {
-            //TODO: do something...
+            listener.remove()
+        })
+        .eraseToAnyPublisher()
+    }
+    
+    static func fetchCompletedTransaction(status: String...) -> AnyPublisher<[Transaction]?, Error> {
+        let subject = CurrentValueSubject<[Transaction]?, Error>(nil)
+        let listener = db.collection("Transaction")
+            .whereFilter(Filter.orFilter(
+                status.map {
+                    Filter.whereField("STATUS", isEqualTo: $0)
+                }
+            ))
+            .addSnapshotListener { (querySnapshot, error) in
+                //TODO: document가 없을때 처리
+                guard (querySnapshot?.documents) != nil else {
+                    subject.send(completion: .failure(error!))
+                    return
+                }
+                
+                subject.send(getTransactionArray(querySnapshot))
+            }
+        
+        return subject.handleEvents(receiveCancel: {
+            listener.remove()
         })
         .eraseToAnyPublisher()
     }
@@ -231,5 +208,30 @@ extension FireStoreService {
             }
         }
         .eraseToAnyPublisher()
+    }
+}
+
+//MARK: - Helper
+extension FireStoreService {
+    static func getProductArray(_ querySnapshot: QuerySnapshot?) -> [Product]? {
+        let products = querySnapshot?.documents.map { document in
+            let data = document.data()
+            let images_map: Dictionary<String, String> = data["IMAGES_MAP"] as! Dictionary<String, String>
+            let image_map_keys: Array<String> = images_map.keys.sorted(by: {$0 < $1})
+            
+            return Product(id: document.documentID, IMAGES_MAP: images_map, IMAGE_MAP_KEYS: image_map_keys, AVAILABILITY: (data["AVAILABILITY"] != nil), LOCATION: data["LOCATION"] as! String, OWNER_ID: data["OWNER_ID"] as! String, POST_CONTENT: data["POST_CONTENT"] as! String, POST_TITLE: data["POST_TITLE"] as! String, PRICE: data["PRICE"] as! Double, PRODUCT_NAME: data["PRODUCT_NAME"] as! String, TIMESTAMP: data["TIMESTAMP"] as! Timestamp, OWNER_NAME: data["OWNER_NAME"] as! String, PROFILE_IMAGE: data["PROFILE_IMAGE"] as! String, LONGITUDE: data["LONGITUDE"] as! Double, LATITUDE: data["LATITUDE"] as! Double, AVAILABLE_TIME: data["AVAILABLE_TIME"] as! [String])
+        }
+        
+        return products
+    }
+    
+    static func getTransactionArray(_ querySnapshot: QuerySnapshot?) -> [Transaction]? {
+        let transactions = querySnapshot?.documents.map { document in
+            let data = document.data()
+            
+            return Transaction(id: document.documentID, DEPOSIT: data["DEPOSIT"] as! Int, END_DATE: data["END_DATE"] as! Timestamp, LOCATION: data["LOCATION"] as! String, PRICE: data["PRICE"] as! Int, PRODUCT_ID: data["PRODUCT_ID"] as! String, PRODUCT_NAME: data["PRODUCT_NAME"] as! String, RENTEE: data["RENTEE"] as! String, RENTER: data["RENTER"] as! String, START_DATE: data["START_DATE"] as! Timestamp, STATUS: TransactionStatus(rawValue: data["STATUS"] as! String)!, PRODUCT_IMAGE: data["PRODUCT_IMAGE"] as! String)
+        }
+        
+        return transactions
     }
 }

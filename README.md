@@ -16,6 +16,6 @@
 
 ![2](https://github.com/2023-Summer-Project/Boomerang_iOS/assets/103043741/4001e2f5-9002-4699-b1b6-5fa045e45452)
 
-![3](https://github.com/2023-Summer-Project/Boomerang_iOS/assets/103043741/eeef55e2-03cb-40e8-ad5f-365624a06ea3)
+![3](https://github.com/2023-Summer-Project/Boomerang_iOS/assets/103043741/ab1c68bf-44f8-438f-8265-14c39d7d812e)
 
 ---

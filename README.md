@@ -1,4 +1,13 @@
+![KakaoTalk_Photo_2023-09-03-20-40-10](https://github.com/2023-Summer-Project/Boomerang_iOS/assets/103043741/7243cc34-4f85-474f-8cd2-e96bba98a3cd)
+
 # **Boomerang**
+
+<div align="center">
+    <img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=Apple&logoColor=white"/>
+    <img src="https://img.shields.io/badge/Swift-F05138?style=for-the-badge&logo=Swift&logoColor=white"/>
+    <img src="https://img.shields.io/badge/SwiftUI-3070F4?style=for-the-badge&logo=Swift&logoColor=white"/>
+    <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=Firebase&logoColor=white">
+</div>
 
 <br>
 
@@ -33,3 +42,10 @@
 - Database: Google Firebase
 
 ---
+
+## Developers 🙋‍♂️🙋
+|![avtDoyoon](https://avatars.githubusercontent.com/u/61890844?v=4)|![avtJeunghun](https://avatars.githubusercontent.com/u/103043741?v=4)|
+|:---:|:---:|
+|Doyoon Kim|Jeunghun Lee|
+|https://github.com/doyoonkim3312|https://github.com/jeungHunLee|
+|Android-side|iOS-side|
